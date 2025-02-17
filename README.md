@@ -25,3 +25,9 @@ For frontend, we are considering React / React Native. For the database, we are 
 
 ### Third-party libraries / APIs to be used
 None at the moment
+
+## Environment Setup
+For local development:
+1. Copy `.env.template` to `.env` in the backend directory
+2. Fill in your local configuration values (may be whatever you prefer)
+3. Never commit the actual `.env` file, ensure it is gitignored!
