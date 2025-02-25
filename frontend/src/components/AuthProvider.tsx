@@ -20,6 +20,12 @@ interface authContext {
     token: string | null | undefined;
     role: Role | null;
     clearToken: (() => void) | null;
+    login:
+        | (({}: {
+              email: string | null;
+              password: string | null;
+          }) => Promise<void>)
+        | null;
 }
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
@@ -30,6 +36,7 @@ const AuthContext = createContext<authContext>({
     token: null,
     role: null,
     clearToken: null,
+    login: null,
 });
 
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -38,6 +45,22 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const clearTokenFunction = () => {
         setToken(null);
+    };
+
+    const login = async (form: {
+        email: string | null;
+        password: string | null;
+    }) => {
+        if (!form.email || !form.password) return;
+        try {
+            const response = await api.post("auth/token/", {
+                username: form.email,
+                password: form.password,
+            });
+            setToken(response.data.access);
+        } catch {
+            setToken(null);
+        }
     };
 
     useEffect(() => {
@@ -104,7 +127,12 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     return (
         <AuthContext.Provider
-            value={{ token: token, role: null, clearToken: clearTokenFunction }}
+            value={{
+                token: token,
+                role: null,
+                clearToken: clearTokenFunction,
+                login: login,
+            }}
         >
             {children}
         </AuthContext.Provider>
