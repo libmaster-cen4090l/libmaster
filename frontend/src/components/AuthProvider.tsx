@@ -26,6 +26,12 @@ interface authContext {
               password: string | null;
           }) => Promise<void>)
         | null;
+    signup:
+        | (({}: {
+              email: string | null;
+              password: string | null;
+          }) => Promise<void>)
+        | null;
 }
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
@@ -37,6 +43,7 @@ const AuthContext = createContext<authContext>({
     role: null,
     clearToken: null,
     login: null,
+    signup: null,
 });
 
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -54,6 +61,22 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         if (!form.email || !form.password) return;
         try {
             const response = await api.post("auth/token/", {
+                username: form.email,
+                password: form.password,
+            });
+            setToken(response.data.access);
+        } catch {
+            setToken(null);
+        }
+    };
+
+    const signup = async (form: {
+        email: string | null;
+        password: string | null;
+    }) => {
+        if (!form.email || !form.password) return;
+        try {
+            const response = await api.post("auth/signup/", {
                 username: form.email,
                 password: form.password,
             });
@@ -132,6 +155,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 role: null,
                 clearToken: clearTokenFunction,
                 login: login,
+                signup: signup,
             }}
         >
             {children}
