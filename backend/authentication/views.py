@@ -23,10 +23,15 @@ def signup(request):
         user.save()
 
         refresh = RefreshToken.for_user(user)
-        return Response({
-            'refresh': str(refresh),
+
+        response = Response({
             'access': str(refresh.access_token),
         })
+
+        cookie_max_age = 3600 * 24 * 14 # 14 days
+        response.set_cookie('refresh_token', refresh, max_age=cookie_max_age, httponly=True )
+
+        return response
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
