@@ -51,7 +51,7 @@ function Login() {
                         }}
                     ></input>
                     <button
-                        className="block bg-slate-700 w-full p-2 px-4 text-white rounded-lg mt-2 text-base font-semibold"
+                        className="block bg-slate-700 w-full p-2.5 px-4 text-white rounded-lg mt-2 text-base font-semibold"
                         type="submit"
                     >
                         Log in
