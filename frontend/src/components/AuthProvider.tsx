@@ -19,17 +19,26 @@ enum Role {
 interface authContext {
     token: string | null | undefined;
     role: Role | null;
+    clearToken: (() => void) | null;
 }
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
     _retry?: boolean;
 }
 
-const AuthContext = createContext<authContext>({ token: null, role: null });
+const AuthContext = createContext<authContext>({
+    token: null,
+    role: null,
+    clearToken: null,
+});
 
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [token, setToken] = useState<string | null | undefined>();
     const [role, setRole] = useState<null | Role>(null);
+
+    const clearTokenFunction = () => {
+        setToken(null);
+    };
 
     useEffect(() => {
         const refreshToken = async () => {
@@ -94,7 +103,9 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ token: token, role: null }}>
+        <AuthContext.Provider
+            value={{ token: token, role: null, clearToken: clearTokenFunction }}
+        >
             {children}
         </AuthContext.Provider>
     );
