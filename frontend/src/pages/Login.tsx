@@ -10,7 +10,7 @@ function Login() {
         password: string | null;
     }>({ email: null, password: null });
 
-    return auth.token === null ? (
+    return auth.token == null ? (
         <div className="min-h-screen bg-gray-100 p-8 flex justify-center items-center">
             <div className="w-full md:w-1/2 lg:w-1/4">
                 <h1 className="text-3xl font-bold text-gray-900 text-center">
