@@ -1,4 +1,4 @@
-import { InternalAxiosRequestConfig } from "axios";
+import { AxiosError, InternalAxiosRequestConfig } from "axios";
 import {
     Children,
     createContext,
@@ -16,9 +16,14 @@ enum Role {
     ADMIN,
 }
 
+interface Errors {
+    incorrectCredentials: boolean;
+}
+
 interface authContext {
     token: string | null | undefined;
     role: Role | null;
+    errors: Errors;
     clearToken: (() => void) | null;
     login:
         | (({}: {
@@ -44,11 +49,15 @@ const AuthContext = createContext<authContext>({
     clearToken: null,
     login: null,
     signup: null,
+    errors: { incorrectCredentials: false },
 });
 
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [token, setToken] = useState<string | null | undefined>();
     const [role, setRole] = useState<null | Role>(null);
+    const [errors, setErrors] = useState<Errors>({
+        incorrectCredentials: false,
+    });
 
     const clearTokenFunction = () => {
         setToken(null);
@@ -60,12 +69,15 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }) => {
         if (!form.email || !form.password) return;
         try {
+            setErrors({ incorrectCredentials: false });
             const response = await api.post("auth/token/", {
                 username: form.email,
                 password: form.password,
             });
             setToken(response.data.access);
-        } catch {
+        } catch (e) {
+            if (e instanceof AxiosError && e.status == 401)
+                setErrors({ ...errors, incorrectCredentials: true });
             setToken(null);
         }
     };
@@ -76,12 +88,15 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }) => {
         if (!form.email || !form.password) return;
         try {
+            setErrors({ incorrectCredentials: false });
             const response = await api.post("auth/signup/", {
                 username: form.email,
                 password: form.password,
             });
             setToken(response.data.access);
-        } catch {
+        } catch (e) {
+            if (e instanceof AxiosError && e.status == 401)
+                setErrors({ ...errors, incorrectCredentials: true });
             setToken(null);
         }
     };
@@ -153,6 +168,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             value={{
                 token: token,
                 role: null,
+                errors: errors,
                 clearToken: clearTokenFunction,
                 login: login,
                 signup: signup,

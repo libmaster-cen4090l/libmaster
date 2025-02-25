@@ -50,6 +50,11 @@ function Login() {
                             });
                         }}
                     ></input>
+                    {auth.errors.incorrectCredentials && (
+                        <p className="text-red-700">
+                            Incorrect credentials. Please try again!
+                        </p>
+                    )}
                     <button
                         className="block bg-slate-700 w-full p-2.5 px-4 text-white rounded-lg mt-2 text-base font-semibold"
                         type="submit"
