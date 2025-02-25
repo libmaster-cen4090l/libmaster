@@ -29,6 +29,14 @@ def signup(request):
         })
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+@authentication_classes([])
+@permission_classes([])
+def logout(request):
+    response = Response({"message": "Logged out succesfully!"}, status=status.HTTP_200_OK)
+    response.delete_cookie('refresh_token')
+    return response
+
 # HTTP-only cookie workaround (https://github.com/jazzband/djangorestframework-simplejwt/issues/71#issuecomment-1380751960)
 class CookieTokenRefreshSerializer(TokenRefreshSerializer):
     refresh = None
