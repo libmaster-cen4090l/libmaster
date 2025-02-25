@@ -35,9 +35,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         const refreshToken = async () => {
             try {
                 const response = await api.post<{ access: string }>(
-                    "auth/token/refresh/",
-                    {},
-                    { withCredentials: true }
+                    "auth/token/refresh/"
                 ); // This request would automatically contain the HTTP-ONLY cookie refresh token
                 setToken(response.data.access);
             } catch {
