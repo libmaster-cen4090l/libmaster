@@ -17,18 +17,19 @@ enum Role {
 }
 
 interface authContext {
-    isLoggedIn: boolean;
-    role: Role;
+    token: string | null | undefined;
+    role: Role | null;
 }
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
     _retry?: boolean;
 }
 
-const AuthContext = createContext<authContext | null>(null);
+const AuthContext = createContext<authContext>({ token: null, role: null });
 
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [token, setToken] = useState<string | null | undefined>();
+    const [role, setRole] = useState<null | Role>(null);
 
     useEffect(() => {
         const refreshToken = async () => {
@@ -94,7 +95,14 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         };
     }, []);
 
-    return <>{children}</>;
+    return (
+        <AuthContext.Provider value={{ token: token, role: null }}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
 
 export default AuthProvider;
+export const useAuth = () => {
+    return useContext(AuthContext);
+};
