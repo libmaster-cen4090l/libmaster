@@ -167,11 +167,12 @@ class Reservation( models.Model ):
 
         # check room availability if this is a new reservation, or 
         # status is changing to confirmed
-        if not self.pk or ( self._state.adding is False and self.status == 'confirmed' ):
-            # get existing reservations for this room excluding this one if it exists
+            # MODIFIED CONDITION: This will catch both new and existing confirmed reservations
+        if self._state.adding or self.status == 'confirmed':
+        # Check for conflicting reservations
             conflicting_reservations = Reservation.objects.filter(
                 room=self.room,
-                status__in=[ 'confirmed', 'pending' ],
+                status='confirmed',             # Only check against confirmed reservations
                 start_time__lt=self.end_time,
                 end_time__gt=self.start_time
             )
