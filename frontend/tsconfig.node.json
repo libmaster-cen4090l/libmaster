@@ -1,6 +1,7 @@
 {
   "composite": true,
   "compilerOptions": {
+    "types": ["node"],
     "composite": true,
     "skipLibCheck": true,
     "module": "ESNext",

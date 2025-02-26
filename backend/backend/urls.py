@@ -21,4 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include( 'rest_framework.urls' )),
     path('auth/', include('authentication.urls')),
+    path( 'rooms/', include( 'rooms.urls' ) ),
 ]
+# TODO: Remove rooms.urls (demo devtool)
