@@ -1,1 +1,1 @@
-{"root":["./src/App.tsx","./src/main.tsx","./src/vite-env.d.ts"],"version":"5.7.3"}
+{"root":["./src/App.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/api/axiosInstance.ts","./src/components/AuthProvider.tsx","./src/components/PrivateRoute.tsx","./src/pages/Login.tsx","./src/pages/Logout.tsx","./src/pages/Signup.tsx"],"version":"5.7.3"}

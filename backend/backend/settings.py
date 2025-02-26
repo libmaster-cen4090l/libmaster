@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt',
+    'rooms.apps.RoomsConfig', # rooms app (authd: Dylan)
 ]
 
 MIDDLEWARE = [
@@ -90,6 +91,16 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+]
+
+# CSRF Trusted Origins 
+
+# TODO: Remove this. 
+# I (Dylan) added this for testing via remotely hosted webserver
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://dconn.dev',
+    'https://www.dconn.dev',
 ]
 
 TEMPLATES = [
