@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLibrary } from '../contexts/LibraryContext';
-import {useAuth } from './AuthProvider';
-import { Link } from 'react-router-dom';
+import { useAuth } from '../components/AuthProvider';
+import { Link, Navigate } from 'react-router-dom';
 
 const LoadingSpinner = () => (
     <div className="flex justify-center items-center">
@@ -20,11 +20,17 @@ const LibraryBrowser: React.FC = () => {
         error,
         selectLibrary,
         selectFloor,
-        selectRoom
+        selectRoom,
+        refreshLibraries
     } = useLibrary();
 
     const auth = useAuth();
     const isAuthenticated = !!auth.token;
+
+    // Redirect to login if not authenticated
+    if (auth.token === null) {
+        return <Navigate to="/login" />;
+    }
 
     const formatTime = (timeString: string) => {
         const [hours, minutes] = timeString.split(':');
@@ -34,15 +40,22 @@ const LibraryBrowser: React.FC = () => {
         return `${formattedHour}:${minutes} ${period}`;
     };
 
-    const handleRoomSelect = (room: any) => {
-        selectRoom(room);
-        //For future navigation to room detail page
-        // navigate(`/rooms/${room.room_id}`);
-    };
-
     return (
         <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-8 text-gray-900">Library Study Rooms</h1>
+            <div className="flex justify-between items-center mb-8">
+                <h1 className="text-3xl font-bold text-gray-900">Library Study Rooms</h1>
+                <div className="flex gap-4">
+                    <button 
+                        onClick={() => refreshLibraries()} 
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                    >
+                        Refresh
+                    </button>
+                    <Link to="/logout" className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+                        Logout
+                    </Link>
+                </div>
+            </div>
 
             {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -120,8 +133,8 @@ const LibraryBrowser: React.FC = () => {
                     )}
                 </div>
         
-                    {/* Rooms Column */}
-                    <div className="bg-white p-6 rounded-lg shadow">
+                {/* Rooms Column */}
+                <div className="bg-white p-6 rounded-lg shadow">
                     <h2 className="text-xl font-semibold mb-4 text-gray-800">
                         {selectedFloor 
                         ? `Rooms - Floor ${selectedFloor.number}` 
@@ -172,21 +185,12 @@ const LibraryBrowser: React.FC = () => {
                                 
                                 {room.status === 'available' && (
                                     <div className="mt-2">
-                                    {isAuthenticated ? (
-                                        <Link 
-                                        to={`/reserve/${room.room_id}`}
-                                        className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded-md block text-center transition-colors duration-200"
-                                        >
-                                        Reserve
-                                        </Link>
-                                    ) : (
-                                        <Link 
-                                        to="/login"
-                                        className="bg-gray-500 hover:bg-gray-600 text-white text-sm px-3 py-1 rounded-md block text-center transition-colors duration-200"
-                                        >
-                                        Login to Reserve
-                                        </Link>
-                                    )}
+                                    <Link 
+                                    to={`/reserve/${room.room_id}`}
+                                    className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded-md block text-center transition-colors duration-200"
+                                    >
+                                    Reserve
+                                    </Link>
                                     </div>
                                 )}
                                 </div>
