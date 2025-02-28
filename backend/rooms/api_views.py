@@ -7,6 +7,7 @@ from datetime import datetime
 from .models import Library, Floor, Room, Reservation
 from .serializers import LibrarySerializer, FloorSerializer, RoomSerializer, ReservationSerializer, RoomAvailabilitySerializer
 from django.http import JsonResponse
+from rest_framework.permissions import AllowAny
 
 # ViewSets for browsing (no authentication required)
 class LibraryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -16,7 +17,7 @@ class LibraryViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Library.objects.all()
     serializer_class = LibrarySerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny]
 
 class FloorViewSet(viewsets.ReadOnlyModelViewSet):
     """
