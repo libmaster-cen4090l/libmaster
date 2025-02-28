@@ -4,8 +4,8 @@
 
 # rooms/urls.py
 from django.urls import path
-from . import views
+from . import api_views
 
 urlpatterns = [
-    path('demo/', views.demo_view, name='demo'),
+    path('demo/', api_views.demo_view, name='demo'),
 ]
