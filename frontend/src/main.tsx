@@ -8,6 +8,8 @@ import AuthProvider from "./components/AuthProvider.tsx";
 import PrivateRoute from "./components/PrivateRoute.tsx";
 import Logout from "./pages/Logout.tsx";
 import Signup from "./pages/Signup.tsx";
+import { LibraryProvider } from "./contexts/LibraryContext.tsx";
+import LibraryBrowser from "./components/LibraryBrowser.tsx";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
@@ -15,11 +17,17 @@ createRoot(document.getElementById("root")!).render(
             <AuthProvider>
                 <Routes>
                     <Route element={<PrivateRoute />}>
-                        <Route path="/" element={<App />} />
+                        <Route path="/*" element={<App />} />
                     </Route>
                     <Route path="/login" element={<Login />} />
                     <Route path="/logout" element={<Logout />} />
                     <Route path="/signup" element={<Signup />} />
+                    <Route path="/" element={
+                            <LibraryProvider>
+                                <LibraryBrowser></LibraryBrowser>
+                            </LibraryProvider>
+                        }
+                    />
                 </Routes>
             </AuthProvider>
         </BrowserRouter>
