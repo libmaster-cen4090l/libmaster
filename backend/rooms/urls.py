@@ -30,4 +30,9 @@ urlpatterns = [
          api_views.RoomViewSet.as_view({'get': 'list'}), 
          {'floor': lambda x: x}, 
          name='floor-rooms'),
+
+     path('libraries/<int:library_id>/materials/',
+         api_views.MaterialViewSet.as_view({'get': 'list'}),
+         {'library': lambda x: x},
+         name='library-materials'),
 ]

@@ -118,9 +118,14 @@ class ReservationViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class MaterialViewSet(viewsets.ModelViewSet):
-    queryset = Material.objects.all()
+class MaterialViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = MaterialSerializer
+    queryset = Material.objects.all() 
+    def get_queryset(self):
+        library_id = self.kwargs.get('library_id')
+        return Material.objects.filter(library_id=library_id)
+
+
 
 
 def demo_view(request):

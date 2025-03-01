@@ -172,3 +172,26 @@ export const createReservation = async (reservationData: {
     return null;
   }
 };
+
+//Show materials
+export interface Material {
+  id: number;
+  name: "calculator" | "markers" | "phone_charger";
+  library: number; 
+  created_at: string;
+}
+
+// Fetch materials for a specific library
+export const getLibraryMaterials = async (libraryId: number): Promise<Material[]> => {
+  try {
+      const response = await api.get(`/rooms/libraries/${libraryId}/materials/`);
+      console.log("Raw materials API response:", response.data); // ✅ Debug log
+
+      // Extract "results" array from paginated response
+      return response.data.results || [];
+  } catch (error) {
+      console.error(`Error fetching materials for library ${libraryId}:`, error);
+      return [];
+  }
+};
+

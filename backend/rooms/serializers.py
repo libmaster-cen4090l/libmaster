@@ -43,4 +43,4 @@ class RoomAvailabilitySerializer(serializers.Serializer):
 class MaterialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Material
-        fields = '__all__'
+        fields = ['id', 'name', 'library', 'created_at']
