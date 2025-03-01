@@ -185,7 +185,7 @@ export interface Material {
 export const getLibraryMaterials = async (libraryId: number): Promise<Material[]> => {
   try {
       const response = await api.get(`/rooms/libraries/${libraryId}/materials/`);
-      console.log("Raw materials API response:", response.data); // ✅ Debug log
+      console.log("Raw materials API response:", response.data); 
 
       // Extract "results" array from paginated response
       return response.data.results || [];
