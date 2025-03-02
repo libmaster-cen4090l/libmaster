@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Library, Floor, Room, Reservation
+from .models import Library, Floor, Room, Reservation, Material
 
 class LibrarySerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,3 +39,8 @@ class ReservationSerializer(serializers.ModelSerializer):
 
 class RoomAvailabilitySerializer(serializers.Serializer):
     date = serializers.DateField()
+
+class MaterialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Material
+        fields = ['id', 'name', 'library', 'created_at']

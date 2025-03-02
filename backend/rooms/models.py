@@ -1,6 +1,6 @@
-# Author(s): Dylan Connolly
-# Purpose: Define the models for Library, Floor, Room, Reservation
-# Modified: 2/25/2025 @ 8:24:29 PM EST
+# Author(s): Dylan Connolly and Colby Leavitt
+# Purpose: Define the models for Library, Floor, Room, Reservation, Material
+# Modified: 2/28/2025 @ 9:20 PM EST
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -203,3 +203,19 @@ class Reservation( models.Model ):
             raise ValidationError(
                 f"Number of attendees exceeds maximum room capacity ({self.room.capacity})."
             )
+
+class Material(models.Model):
+    """A model representing a material that can be rented from the library"""
+    MATERIAL_TYPES = [
+        ("calculator", "Calculator"),
+        ("markers", "Markers"),
+        ("phone_charger", "Phone Charger"),
+    ]
+
+    id = models.AutoField(primary_key=True)  # Unique identifier
+    name = models.CharField(max_length=50, choices=MATERIAL_TYPES)
+    library = models.ForeignKey(Library, on_delete=models.CASCADE, related_name="materials")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.get_name_display()} - {self.library.name}"

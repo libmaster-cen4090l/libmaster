@@ -14,6 +14,7 @@ const LibraryBrowser: React.FC = () => {
         libraries,
         selectedLibrary,
         floors,
+        materials,
         selectedFloor,
         rooms,
         loading,
@@ -132,7 +133,7 @@ const LibraryBrowser: React.FC = () => {
                         <p className="text-gray-500 text-center py-4">No floors available for this library.</p>
                     )}
                 </div>
-        
+
                 {/* Rooms Column */}
                 <div className="bg-white p-6 rounded-lg shadow">
                     <h2 className="text-xl font-semibold mb-4 text-gray-800">
@@ -204,6 +205,28 @@ const LibraryBrowser: React.FC = () => {
                         <p className="text-gray-500 text-center py-4">No rooms available on this floor.</p>
                     )}
                 </div>
+
+                {/* Materials Column */}
+                {selectedLibrary && (
+                    <div className="mt-6">
+                        <h2 className="text-xl font-semibold text-gray-800">
+                            Available Materials at {selectedLibrary.name}
+                        </h2>
+                        {loading.materials ? ( 
+                            <LoadingSpinner />
+                        ) : materials.length > 0 ? (
+                            <ul className="list-disc ml-6 mt-2">
+                                {materials.map((material) => (
+                                    <li key={material.id} className="text-gray-700">
+                                        {material.name.replace("_", " ").toUpperCase()} {/* Format names */}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p className="text-gray-600 italic">No materials available.</p>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );

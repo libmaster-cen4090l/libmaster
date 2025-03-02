@@ -1,9 +1,9 @@
-# Author(s): Dylan Connolly
+# Author(s): Dylan Connolly and Colby Leavitt
 # Purpose: Define the Administration interface
-# Modified: 2/25/2025 @ 9:15:19 PM EST
+# Modified: 2/28/2025 @ 9:21:19 PM EST
 
 from django.contrib import admin
-from .models import Library, Floor, Room, Reservation
+from .models import Library, Floor, Room, Reservation, Material
 
 """
 Django's admin interface provides a built-in way to manage our application data
@@ -94,4 +94,12 @@ class ReservationAdmin( admin.ModelAdmin ):
             'fields': ( 'created_at', 'modified_at' )
         }),
     )
+
+@admin.register(Material)
+class MaterialAdmin(admin.ModelAdmin):
+    """Manages materials in admin"""
+    list_display = ("id", "name", "library", "created_at") 
+    list_filter = ("library", "name")  
+    search_fields = ("id", "name", "library__name")  
+    ordering = ("library", "name")  
 

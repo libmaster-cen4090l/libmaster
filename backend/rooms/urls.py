@@ -12,6 +12,7 @@ router.register(r'libraries', api_views.LibraryViewSet)
 router.register(r'floors', api_views.FloorViewSet)
 router.register(r'rooms', api_views.RoomViewSet)
 router.register(r'reservations', api_views.ReservationViewSet)
+router.register(r'materials', api_views.MaterialViewSet)
 
 urlpatterns = [
     path('demo/', api_views.demo_view, name='demo'),
@@ -29,4 +30,9 @@ urlpatterns = [
          api_views.RoomViewSet.as_view({'get': 'list'}), 
          {'floor': lambda x: x}, 
          name='floor-rooms'),
+
+     path('libraries/<int:library_id>/materials/',
+         api_views.MaterialViewSet.as_view({'get': 'list'}),
+         {'library': lambda x: x},
+         name='library-materials'),
 ]

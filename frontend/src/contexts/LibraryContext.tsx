@@ -3,9 +3,11 @@ import {
     getLibraries,
     getLibraryFloors,
     getFloorRooms,
+    getLibraryMaterials,
     Library,
     Floor,
-    Room
+    Room,
+    Material
 } from '../api/libraryService';
 
 interface LibraryContextType {
@@ -15,10 +17,12 @@ interface LibraryContextType {
     selectedFloor: Floor | null;
     rooms: Room[];
     selectedRoom: Room | null;
+    materials: Material[];
     loading: {
         libraries: boolean;
         floors: boolean;
         rooms: boolean;
+        materials: boolean;
     };
     error: string | null;
     selectLibrary: (library: Library | null) => void;
@@ -36,10 +40,12 @@ export const LibraryProvider: React.FC<{children: ReactNode}> = ({ children }) =
     const [selectedFloor, setSelectedFloor] = useState<Floor | null>(null);
     const [rooms, setRooms] = useState<Room[]>([]);
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+    const [materials, setMaterials] = useState<Material[]>([]);
     const [loading, setLoading] = useState({
         libraries: false,
         floors: false,
-        rooms: false
+        rooms: false,
+        materials: false
     });
     const [error, setError] = useState<string | null>(null);
 
@@ -52,10 +58,12 @@ export const LibraryProvider: React.FC<{children: ReactNode}> = ({ children }) =
     useEffect(() => {
         if (selectedLibrary) {
             fetchFloors(selectedLibrary.id);
+            fetchMaterials(selectedLibrary.id);
         } else {
             // Clear floors when no library is selected
             setFloors([]);
             setSelectedFloor(null);
+            setMaterials([]);
         }
     }, [selectedLibrary]);
 
@@ -168,6 +176,24 @@ export const LibraryProvider: React.FC<{children: ReactNode}> = ({ children }) =
         }
     };
 
+    const fetchMaterials = async (libraryId: number) => {
+        setMaterials([]);
+        setLoading(prev => ({ ...prev, materials: true }));
+    
+        try {
+            console.log(`Fetching materials for library ${libraryId}...`);
+            const data = await getLibraryMaterials(libraryId);
+            console.log("Materials fetched:", data);
+            setMaterials(data);
+        } catch (err: any) {
+            console.error(`Error fetching materials for library ${libraryId}:`, err);
+            setError(`Failed to load materials for library ${libraryId}.`);
+        } finally {
+            setLoading(prev => ({ ...prev, materials: false }));
+        }
+    };
+    
+
     const selectLibrary = (library: Library | null) => {
         console.log("Selecting library:", library?.id, library?.name);
         // Only update if different from current selection
@@ -178,6 +204,7 @@ export const LibraryProvider: React.FC<{children: ReactNode}> = ({ children }) =
             setSelectedRoom(null);
             setFloors([]);
             setRooms([]);
+            setMaterials([]);
         }
     };
 
@@ -206,6 +233,7 @@ export const LibraryProvider: React.FC<{children: ReactNode}> = ({ children }) =
                 selectedFloor,
                 rooms,
                 selectedRoom,
+                materials,
                 loading,
                 error,
                 selectLibrary,

@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from datetime import datetime
-from .models import Library, Floor, Room, Reservation
-from .serializers import LibrarySerializer, FloorSerializer, RoomSerializer, ReservationSerializer, RoomAvailabilitySerializer
+from .models import Library, Floor, Room, Reservation, Material
+from .serializers import LibrarySerializer, FloorSerializer, RoomSerializer, ReservationSerializer, RoomAvailabilitySerializer, MaterialSerializer
 from django.http import JsonResponse
 
 # ViewSets for browsing (no authentication required)
@@ -116,6 +116,17 @@ class ReservationViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class MaterialViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = MaterialSerializer
+    queryset = Material.objects.all() 
+    def get_queryset(self):
+        library_id = self.kwargs.get('library_id')
+        return Material.objects.filter(library_id=library_id)
+
+
+
 
 def demo_view(request):
     # get counts of each model
