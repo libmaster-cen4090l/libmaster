@@ -1,6 +1,31 @@
+/**
+ * LibraryBrowser Component 
+ *
+ * Main interface for browsing libraries, floors, and rooms.
+ * Allows users to select a library, view its floors, and 
+ * browse available rooms.
+ *
+ * Author(s): Zack Lima, Ivan Lepesii, Colby Leavitt, Dylan Connolly
+ * Modified: 3/3/2025 @ 2:48:02 EST by Dylan 
+ *
+ * MODIFICATIONS:
+ * - Added navigation link to My Reservations page
+ * - Incorporated the RecentReservations component for viewing recent bookings
+ * - Enhanced header with improved navigation options 
+ * - Added conditional rendering based on authentication status 
+ *
+ * @component
+ * @requires React
+ * @requires react-router-dom 
+ * @requires ../contexts/LibraryContext 
+ * @requires ../components/AuthProvider 
+ * @requires ./RecentReservations 
+ */ 
+
 import React, { useEffect } from 'react';
 import { useLibrary } from '../contexts/LibraryContext';
 import { useAuth } from '../components/AuthProvider';
+import RecentReservations from '../components/RecentReservations';
 import { Link, Navigate } from 'react-router-dom';
 
 const LoadingSpinner = () => (
@@ -43,9 +68,16 @@ const LibraryBrowser: React.FC = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
+            { /*header with navigation links */ }
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold text-gray-900">Library Study Rooms</h1>
                 <div className="flex gap-4">
+                    <Link
+                        to="/my-reservations"
+                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+                    >
+                      My Reservations
+                    </Link>
                     <button 
                         onClick={() => refreshLibraries()} 
                         className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
@@ -63,7 +95,8 @@ const LibraryBrowser: React.FC = () => {
                     {error}
                 </div>
             )}
-
+            
+            { /* MAIN GRID for libraries, floors, rooms, materials */ }
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Libraries Column */}
                 <div className="bg-white p-6 rounded-lg shadow">
@@ -228,6 +261,25 @@ const LibraryBrowser: React.FC = () => {
                     </div>
                 )}
             </div>
+            { /* After main grid */ }
+            { /* ADDED: Recent reservations section */ }
+            {isAuthenticated && (
+                <div className="mt-8">
+                    <div className="bg-white p-6 rounded-lg shadow">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-semibold text-gray-800">My Current Reservations</h2>
+                            <Link 
+                                to="/my-reservations"
+                                className="text-blue-500 hover:text-blue-700"
+                             >
+                                View All
+                            </Link>
+                        </div>
+                        
+                        <RecentReservations />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

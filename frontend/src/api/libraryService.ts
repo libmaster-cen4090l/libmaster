@@ -1,4 +1,6 @@
 import api from './axiosInstance';
+import roomApi from './axiosInstance';
+import axios, { AxiosError } from 'axios';
 
 export interface Library {
   id: number;
@@ -34,7 +36,8 @@ export interface Room {
 export interface Reservation {
   reservation_id: string;
   room: string;
-  start_time: string;
+  room_id?: string;
+  start_time: string; // matches backend serializer
   end_time: string;
   status: string;
   purpose: string;
@@ -165,11 +168,73 @@ export const createReservation = async (reservationData: {
   notes?: string;
 }): Promise<Reservation | null> => {
   try {
-    const response = await api.post('/rooms/reservations/', reservationData);
+    // first, get the room object to find its numerical id
+    const roomResponse = await api.get(`/rooms/rooms/${reservationData.room_id}/`);
+    const roomData = roomResponse.data;
+
+    // now create the reservation using the room's ID field (not room_id)
+    const reservationPayload = {
+      room: roomData.id, // use numerical id instead of room_id
+      start_time: reservationData.start_time,
+      end_time: reservationData.end_time,
+      purpose: reservationData.purpose || '',
+      num_attendees: reservationData.num_attendees || 1,
+      notes: reservationData.notes || ''
+    };
+
+    console.log( "Creating reservation with payload:", reservationPayload );
+    const response = await api.post( '/rooms/reservations/', reservationPayload );
+
+    console.log( 'Reservation created:', response.data );
     return response.data;
-  } catch (error) {
-    logError('Error creating reservation', error);
+  } catch ( error ) {
+    logError( 'Error creating reservation', error );
+
+    // check for specific error types
+    if ( axios.isAxiosError( error ) && error.response ) {
+      // handle validation errors
+      if ( error.response.status === 400 ) {
+        console.error( 'Validation error:', error.response.data );
+      }
+      // handle authorization errors
+      else if ( error.response.status === 401 || error.response.status === 403 ) {
+        console.error( 'Authorization error' );
+      }
+    }
+
     return null;
+  }
+};
+
+// (Dylan) added a function to cancel a reservation
+export const cancelReservation = async ( reservationId: string): Promise<boolean> => 
+{
+  try
+  {
+    const response = await api.patch( `/rooms/reservations/${reservationId}/`, {
+      status: 'cancelled'
+    });
+    return response.status === 200;
+  }
+  catch ( error )
+  {
+    logError( `Error cancelling reservation ${reservationId}`, error );
+    return false;
+  }
+};
+
+// (Dylan) added a function to get user reservations
+export const getUserReservations = async (): Promise<Reservation[]> =>
+{
+  try
+  {
+    const response = await api.get<PaginatedResponse<Reservation>>('/rooms/reservations/');
+    return response.data.results || [];
+  }
+  catch ( error )
+  {
+    logError( 'Error fetching user reservations', error );
+    return [];
   }
 };
 
