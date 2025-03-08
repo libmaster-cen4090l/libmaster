@@ -126,16 +126,15 @@ class ReservationViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    # custom create method to handle room_id strings
-    def create( self, request, *args, **kwargs ):
+    def create(self, request, *args, **kwargs):
         data = request.data.copy()
 
-        # Check if room is provided as a string room_id
+        # check if room is provided as a string room_id
         if 'room' in data and isinstance(data['room'], str) and not data['room'].isdigit():
             try:
-                # Find room by room_id instead of pk
-                room = Room.objects.get(room_id=data['room'])
-                data['room'] = room.pk  # Replace with actual primary key
+                # find room by room_id
+                room = Room.objects.get( room_id=data['room'] )
+                data['room'] = room.pk  # replace with actual primary key
             except Room.DoesNotExist:
                 return Response(
                     {"error": f"Room with ID '{data['room']}' not found"},
@@ -147,6 +146,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 
 class MaterialViewSet(viewsets.ReadOnlyModelViewSet):
@@ -191,22 +191,23 @@ def demo_view(request):
         "sample_rooms": sample_rooms
     })
 
-
+# Update room_detail view to support lookup by old or new format
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
 def room_detail(request, room_id):
     """
     Get detailed information about a specific room by its room_id.
+    Supports both old and new format room IDs for backward compatibility.
     """
     try:
-        # Debug: Print all available room_ids to help diagnose
-        all_room_ids = Room.objects.values_list('room_id', flat=True)
-        print(f"Available room_ids: {list(all_room_ids)}")
-        
         room = Room.objects.get(room_id=room_id)
         serializer = RoomSerializer(room)
         return Response(serializer.data)
     except Room.DoesNotExist:
+        # Debug: Print all available room_ids to help diagnose
+        all_room_ids = Room.objects.values_list('room_id', flat=True)
+        print(f"Available room_ids: {list(all_room_ids)}")
+        
         return Response(
             {"error": f"Room with ID '{room_id}' not found"},
             status=status.HTTP_404_NOT_FOUND

@@ -31,11 +31,6 @@ const MyReservations: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check authentication
-    if (!auth.token) {
-      navigate('/login');
-      return;
-    }
     
     /**
      * Fetches all of the user's reservations from the API
@@ -61,7 +56,7 @@ const MyReservations: React.FC = () => {
     };
 
     fetchReservations();
-  }, [auth.token, navigate]);
+  }, [navigate]);
 
   /**
    * Formats a date string into a user-friendly format

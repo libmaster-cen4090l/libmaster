@@ -1,7 +1,6 @@
 # Author(s): Dylan Connolly and Colby Leavitt
 # Purpose: Define the Administration interface
 # Modified: 2/28/2025 @ 9:21:19 PM EST
-
 from django.contrib import admin
 from .models import Library, Floor, Room, Reservation, Material
 
@@ -30,34 +29,38 @@ class FloorAdmin( admin.ModelAdmin ):
 
 @admin.register( Room )
 class RoomAdmin( admin.ModelAdmin ):
-    # shows these fields in the rooms list
-    list_display = ( 'room_id', 'floor', 'capacity', 'status' )
+    # Update the list_display to include room_number
+    list_display = ('room_id', 'room_number', 'floor', 'capacity', 'status')
 
-    # multiple filters to help admins find rooms with specific criteria
-    # the floor__library lets adminds filter rooms by their library
-    list_filter = ( 'floor__library', 'floor', 'status', 'has_whiteboard', 'has_monitor' )
+    # Add filters for the new fields
+    list_filter = ('floor__library', 'floor', 'status', 'has_whiteboard', 'has_monitor')
 
-    # search functionality for finding specific rooms
-    search_fields = ( 'room_id', 'floor__library__name' )
+    # Search by both room_id and room_number
+    search_fields = ('room_id', 'room_number', 'floor__library__name')
 
-    # fieldsets organize the add/edit form into logical secitons
-    # each tuple has a section name and a dictionary of options
+    # Update fieldsets to include room_number in the appropriate section
     fieldsets = (
-        # basic room information (None indicates this section has no heading)
-        ( None, {
-            'fields': ( 'room_id', 'floor', 'capacity', 'status' )
+        # Basic room information section - ADD room_number here
+        (None, {
+            'fields': ('room_number', 'floor', 'capacity', 'status')
         }),
-        # group all amenity fields together
-        ( 'Amenities', {
-            'fields': ( 'has_whiteboard', 'has_monitor', 'has_window' )
+        # Amenities section
+        ('Amenities', {
+            'fields': ('has_whiteboard', 'has_monitor', 'has_window')
         }),
-        # floor map coordinates in a collapsible section to save space
-        # 'collapse' means this section starts folded up
-        ( 'Map Position', {
-            'classes': ( 'collapse', ),
-            'fields': ( 'position_x', 'position_y', 'width', 'height' )
+        # Map position section
+        ('Map Position', {
+            'classes': ('collapse',),
+            'fields': ('position_x', 'position_y', 'width', 'height')
         }),
     )
+    
+    # Make room_id read-only since it's auto-generated
+    readonly_fields = ('room_id',)
+    
+    # If you want to show room_id in the form (as read-only)
+    # Add this to the first fieldset:
+    # 'fields': ('room_id', 'room_number', 'floor', 'capacity', 'status')
 
 @admin.register( Reservation )
 class ReservationAdmin( admin.ModelAdmin ):

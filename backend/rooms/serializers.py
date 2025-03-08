@@ -14,12 +14,17 @@ class FloorSerializer(serializers.ModelSerializer):
 class RoomSerializer(serializers.ModelSerializer):
     library_name = serializers.CharField(source='floor.library.name', read_only=True)
     floor_number = serializers.IntegerField(source='floor.number', read_only=True)
-
+    library_code = serializers.CharField(source='floor.library.code', read_only=True)
+    display_name = serializers.CharField(read_only=True)
+    location_description = serializers.CharField(read_only=True)
+    room_number = serializers.CharField()
+    
     class Meta:
         model = Room
         fields = [
             'id',
-            'room_id', 'floor', 'library_name', 'floor_number', 
+            'room_id', 'room_number', 'floor', 'library_name', 'library_code', 
+            'floor_number', 'display_name', 'location_description',
             'capacity', 'has_whiteboard', 'has_monitor', 'has_window',
             'status', 'position_x', 'position_y', 'width', 'height'
         ]

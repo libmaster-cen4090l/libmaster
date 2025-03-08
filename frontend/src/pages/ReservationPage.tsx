@@ -38,8 +38,6 @@ const ReservationPage: React.FC = () => {
   const [room, setRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState(true);
   const [localError, setLocalError] = useState<string | null>(null);
-
-  const isMountedRef = useRef( true );
   
   // authentication and library context hooks 
   const auth = useAuth();
@@ -50,15 +48,6 @@ const ReservationPage: React.FC = () => {
   {
     return <Navigate to="/login" />;
   }
-
-  // cleanup on unmount
-  useEffect(() =>
-  {
-    return () =>
-    {
-      isMountedRef.current = false;
-    };
-  }, [] );
 
   /**
    * Fetch room data when component mounts or roomId changes
@@ -84,37 +73,28 @@ const ReservationPage: React.FC = () => {
         console.log( "Attempting to fetch room data for roomId:", roomId );
         const roomData = await getRoomById( roomId );
 
-        // Only update state if component is still mounted
-        if ( isMountedRef.current ) 
+        if ( roomData ) 
         {
-          if ( roomData ) 
-          {
-            setRoom( roomData );
-            setLocalError( null );
-          } 
-          else 
-          {
-            setLocalError( `Unable to load room ${roomId}` );
-          }
-          setLoading( false );
+          setRoom( roomData );
+          setLocalError( null );
+        } 
+        else 
+        {
+          setLocalError( `Unable to load room ${roomId}` );
         }
+        setLoading( false );
       } 
       catch ( err ) 
       {
         console.error( "Component error fetching room:", err );
 
-        // Only update state if component is still mounted
-        if ( isMountedRef.current ) 
-        {
-          setLocalError( "An error occurred while loading room information" );
-          setLoading( false );
-        }
+        setLocalError( "An error occurred while loading room information" );
+        setLoading( false );
       }
     }
 
     fetchRoomData();
 
-    // no cleanup function needed here - use the isMountedRef approach
   }, [roomId]); // ONLY depend on roomId
 
   // show loading state while fetching room data 

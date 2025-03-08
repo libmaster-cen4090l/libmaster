@@ -39,9 +39,6 @@ import PrivateRoute from "./components/PrivateRoute.tsx";
 import Logout from "./pages/Logout.tsx";
 import Signup from "./pages/Signup.tsx";
 import { LibraryProvider } from "./contexts/LibraryContext.tsx";
-import LibraryBrowser from "./components/LibraryBrowser.tsx";
-import ReservationPage from "./pages/ReservationPage.tsx";
-import MyReservations from "./pages/MyReservations.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -53,10 +50,7 @@ createRoot(document.getElementById("root")!).render(
                       { /* Protected routes requiring authentication */ }
                       <Route element={<PrivateRoute />}>
                           { /* ADDED: configured routing for reservations in App.tsx */ }
-                          <Route path="/" element={<App />} />
-                          { /* ADDED: new routes for reservation functionality */ }
-                          <Route path="/reserve/:roomId" element={<ReservationPage />} />
-                          <Route path="/my-reservations" element={<MyReservations />} />
+                          <Route path="/*" element={<App />} />
                       </Route>
                       <Route path="/login" element={<Login />} />
                       <Route path="/logout" element={<Logout />} />
