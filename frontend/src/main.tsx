@@ -26,7 +26,7 @@
  * @requires ./pages/Signup
  * @requires ./pages/ReservationPage
  * @requires ./pages/MyReservations
- */ 
+ */
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -34,30 +34,30 @@ import "./index.css";
 import App from "./App.tsx";
 import { BrowserRouter, Route, Router, Routes } from "react-router";
 import Login from "./pages/Login.tsx";
-import AuthProvider from "./components/AuthProvider.tsx";
+import AuthProvider from "./contexts/AuthProvider.tsx";
 import PrivateRoute from "./components/PrivateRoute.tsx";
 import Logout from "./pages/Logout.tsx";
 import Signup from "./pages/Signup.tsx";
 import { LibraryProvider } from "./contexts/LibraryContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-      <BrowserRouter>
-          <AuthProvider>
-              { /* MODIFIED: Wrapped all routes in LibraryProvider to ensure context access */ }
-              <LibraryProvider> 
-                  <Routes>
-                      { /* Protected routes requiring authentication */ }
-                      <Route element={<PrivateRoute />}>
-                          { /* ADDED: configured routing for reservations in App.tsx */ }
-                          <Route path="/*" element={<App />} />
-                      </Route>
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/logout" element={<Logout />} />
-                      <Route path="/signup" element={<Signup />} />
-                  </Routes>
-              </LibraryProvider>
-          </AuthProvider>
-      </BrowserRouter>
-  </StrictMode>
+    <StrictMode>
+        <BrowserRouter>
+            <AuthProvider>
+                {/* MODIFIED: Wrapped all routes in LibraryProvider to ensure context access */}
+                <LibraryProvider>
+                    <Routes>
+                        {/* Protected routes requiring authentication */}
+                        <Route element={<PrivateRoute />}>
+                            {/* ADDED: configured routing for reservations in App.tsx */}
+                            <Route path="/*" element={<App />} />
+                        </Route>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/logout" element={<Logout />} />
+                        <Route path="/signup" element={<Signup />} />
+                    </Routes>
+                </LibraryProvider>
+            </AuthProvider>
+        </BrowserRouter>
+    </StrictMode>
 );

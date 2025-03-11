@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useState } from "react";
 import api from "../api/axiosInstance";
-import { useAuth } from "@/components/AuthProvider";
+import { useAuth } from "@/contexts/AuthProvider";
 import { Navigate } from "react-router";
 
 function Signup() {

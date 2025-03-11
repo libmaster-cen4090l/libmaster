@@ -1,9 +1,8 @@
 import { Navigate, Outlet } from "react-router";
-import { useAuth } from "./AuthProvider";
+import { useAuth } from "../contexts/AuthProvider";
 
 function PrivateRoute() {
     const auth = useAuth();
-    console.log(auth);
     return auth.token === null ? <Navigate to="/login" /> : <Outlet />;
 }
 

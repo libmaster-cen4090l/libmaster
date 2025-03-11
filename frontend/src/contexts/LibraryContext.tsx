@@ -1,5 +1,5 @@
 /**
- * LibraryContext 
+ * LibraryContext
  *
  * Context provider for library-related data and operations.
  * Manages state for libraries, floors, rooms, and materials.
@@ -12,81 +12,87 @@
  * - Added getRoomById function to fetch detailed room information
  * - Implemented robust error handling for API requests
  * - Added fallback mechanisms for URL routing inconsistencies
- * - Updated the context interface to include the new function 
+ * - Updated the context interface to include the new function
  *
- * @context 
- * @requires React 
- * @requires axios 
- * @requires ../api/axiosInstance 
- * @requires ../api/libraryService 
- */  
+ * @context
+ * @requires React
+ * @requires axios
+ * @requires ../api/axiosInstance
+ * @requires ../api/libraryService
+ */
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import axios from 'axios';
-import 
-{
-  getLibraries,
-  getLibraryFloors,
-  getFloorRooms,
-  getLibraryMaterials,
-  Library,
-  Floor,
-  Room,
-  Material
-} from '../api/libraryService';
+import React, {
+    createContext,
+    useContext,
+    useState,
+    useEffect,
+    ReactNode,
+} from "react";
+import axios from "axios";
+import {
+    getLibraries,
+    getLibraryFloors,
+    getFloorRooms,
+    getLibraryMaterials,
+    Library,
+    Floor,
+    Room,
+    Material,
+} from "../api/libraryService";
 
-import api from '../api/axiosInstance';
-import roomApi from '../api/axiosInstance';
+import api from "../api/axiosInstance";
+import roomApi from "../api/axiosInstance";
 
-interface LibraryContextType 
-{
-  libraries: Library[];
-  selectedLibrary: Library | null;
-  floors: Floor[];
-  selectedFloor: Floor | null;
-  rooms: Room[];
-  selectedRoom: Room | null;
-  materials: Material[];
-  loading: 
-  {
-    libraries: boolean;
-    floors: boolean;
-    rooms: boolean;
-    materials: boolean;
-  };
-  error: string | null;
-  selectLibrary: (library: Library | null) => void;
-  selectFloor: (floor: Floor | null) => void;
-  selectRoom: (room: Room | null) => void;
-  refreshLibraries: () => Promise<void>;
+interface LibraryContextType {
+    libraries: Library[];
+    selectedLibrary: Library | null;
+    floors: Floor[];
+    selectedFloor: Floor | null;
+    rooms: Room[];
+    selectedRoom: Room | null;
+    materials: Material[];
+    loading: {
+        libraries: boolean;
+        floors: boolean;
+        rooms: boolean;
+        materials: boolean;
+    };
+    error: string | null;
+    selectLibrary: (library: Library | null) => void;
+    selectFloor: (floor: Floor | null) => void;
+    selectRoom: (room: Room | null) => void;
+    refreshLibraries: () => Promise<void>;
 
-  /**
-   * Fetches detailed information for a specific room by its room_id 
-   * First checks local state before making an API request 
-   *
-   * @params {string} roomId - The unique identifier for the room
-   * @returns {Promise<Room | null>} Room data or null if not found
-   */
-  getRoomById: (roomId: string) => Promise<Room | null>;
+    /**
+     * Fetches detailed information for a specific room by its room_id
+     * First checks local state before making an API request
+     *
+     * @params {string} roomId - The unique identifier for the room
+     * @returns {Promise<Room | null>} Room data or null if not found
+     */
+    getRoomById: (roomId: string) => Promise<Room | null>;
 }
 
 const LibraryContext = createContext<LibraryContextType | undefined>(undefined);
 
-export const LibraryProvider: React.FC<{children: ReactNode}> = ({ children }) => 
-{
-  const [libraries, setLibraries] = useState<Library[]>([]);
-  const [selectedLibrary, setSelectedLibrary] = useState<Library | null>(null);
-  const [floors, setFloors] = useState<Floor[]>([]);
-  const [selectedFloor, setSelectedFloor] = useState<Floor | null>(null);
-  const [rooms, setRooms] = useState<Room[]>([]);
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  const [materials, setMaterials] = useState<Material[]>([]);
-  const [loading, setLoading] = useState({
+export const LibraryProvider: React.FC<{ children: ReactNode }> = ({
+    children,
+}) => {
+    const [libraries, setLibraries] = useState<Library[]>([]);
+    const [selectedLibrary, setSelectedLibrary] = useState<Library | null>(
+        null
+    );
+    const [floors, setFloors] = useState<Floor[]>([]);
+    const [selectedFloor, setSelectedFloor] = useState<Floor | null>(null);
+    const [rooms, setRooms] = useState<Room[]>([]);
+    const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+    const [materials, setMaterials] = useState<Material[]>([]);
+    const [loading, setLoading] = useState({
         libraries: false,
         floors: false,
         rooms: false,
         materials: false,
-        singleRoom: false
+        singleRoom: false,
     });
     const [error, setError] = useState<string | null>(null);
 
@@ -120,26 +126,28 @@ export const LibraryProvider: React.FC<{children: ReactNode}> = ({ children }) =
     }, [selectedFloor]);
 
     const refreshLibraries = async () => {
-        setLoading(prev => ({ ...prev, libraries: true }));
+        setLoading((prev) => ({ ...prev, libraries: true }));
         setError(null);
-        
+
         try {
-            console.log("Fetching libraries...");
+            // console.log("Fetching libraries...");
             const data = await getLibraries();
-            console.log("Libraries fetched:", data);
+            // console.log("Libraries fetched:", data);
             setLibraries(data);
         } catch (err: any) {
             console.error("Error fetching libraries:", err);
-            
+
             // Check if error is related to authentication
-            if (err?.response?.status === 401 || 
-                err?.response?.data?.code === "token_not_valid") {
+            if (
+                err?.response?.status === 401 ||
+                err?.response?.data?.code === "token_not_valid"
+            ) {
                 setError("Authentication error. Please log in again.");
             } else {
                 setError("Failed to load libraries. Please try again later.");
             }
         } finally {
-            setLoading(prev => ({ ...prev, libraries: false }));
+            setLoading((prev) => ({ ...prev, libraries: false }));
         }
     };
 
@@ -149,35 +157,48 @@ export const LibraryProvider: React.FC<{children: ReactNode}> = ({ children }) =
         setSelectedFloor(null);
         setRooms([]);
         setSelectedRoom(null);
-        
-        setLoading(prev => ({ ...prev, floors: true }));
+
+        setLoading((prev) => ({ ...prev, floors: true }));
         setError(null);
-        
+
         try {
-            console.log(`Fetching floors for library ${libraryId}...`);
+            // console.log(`Fetching floors for library ${libraryId}...`);
             const data = await getLibraryFloors(libraryId);
-            console.log(`Floors fetched for library ${libraryId}:`, data);
-            
+            // console.log(`Floors fetched for library ${libraryId}:`, data);
+
             // Double-check the data to ensure each floor belongs to the selected library
-            const filteredFloors = data.filter(floor => floor.library === libraryId);
-            
+            const filteredFloors = data.filter(
+                (floor) => floor.library === libraryId
+            );
+
             if (filteredFloors.length !== data.length) {
-                console.warn(`Filtered out ${data.length - filteredFloors.length} floors that didn't match library ID ${libraryId}`);
+                console.warn(
+                    `Filtered out ${
+                        data.length - filteredFloors.length
+                    } floors that didn't match library ID ${libraryId}`
+                );
             }
-            
+
             setFloors(filteredFloors);
         } catch (err: any) {
-            console.error(`Error fetching floors for library ${libraryId}:`, err);
-            
+            console.error(
+                `Error fetching floors for library ${libraryId}:`,
+                err
+            );
+
             // Check if error is related to authentication
-            if (err?.response?.status === 401 || 
-                err?.response?.data?.code === "token_not_valid") {
+            if (
+                err?.response?.status === 401 ||
+                err?.response?.data?.code === "token_not_valid"
+            ) {
                 setError("Authentication error. Please log in again.");
             } else {
-                setError(`Failed to load floors for library ${libraryId}. Please try again later.`);
+                setError(
+                    `Failed to load floors for library ${libraryId}. Please try again later.`
+                );
             }
         } finally {
-            setLoading(prev => ({ ...prev, floors: false }));
+            setLoading((prev) => ({ ...prev, floors: false }));
         }
     };
 
@@ -185,58 +206,68 @@ export const LibraryProvider: React.FC<{children: ReactNode}> = ({ children }) =
         // Clear existing rooms and selection
         setRooms([]);
         setSelectedRoom(null);
-        
-        setLoading(prev => ({ ...prev, rooms: true }));
+
+        setLoading((prev) => ({ ...prev, rooms: true }));
         setError(null);
-        
+
         try {
-            console.log(`Fetching rooms for floor ${floorId}...`);
+            // console.log(`Fetching rooms for floor ${floorId}...`);
             const data = await getFloorRooms(floorId);
-            console.log(`Rooms fetched for floor ${floorId}:`, data);
-            
+            // console.log(`Rooms fetched for floor ${floorId}:`, data);
+
             // Double-check the data to ensure each room belongs to the selected floor
-            const filteredRooms = data.filter(room => room.floor === floorId);
-            
+            const filteredRooms = data.filter((room) => room.floor === floorId);
+
             if (filteredRooms.length !== data.length) {
-                console.warn(`Filtered out ${data.length - filteredRooms.length} rooms that didn't match floor ID ${floorId}`);
+                console.warn(
+                    `Filtered out ${
+                        data.length - filteredRooms.length
+                    } rooms that didn't match floor ID ${floorId}`
+                );
             }
-            
+
             setRooms(filteredRooms);
         } catch (err: any) {
             console.error(`Error fetching rooms for floor ${floorId}:`, err);
-            
+
             // Check if error is related to authentication
-            if (err?.response?.status === 401 || 
-                err?.response?.data?.code === "token_not_valid") {
+            if (
+                err?.response?.status === 401 ||
+                err?.response?.data?.code === "token_not_valid"
+            ) {
                 setError("Authentication error. Please log in again.");
             } else {
-                setError(`Failed to load rooms for floor ${floorId}. Please try again later.`);
+                setError(
+                    `Failed to load rooms for floor ${floorId}. Please try again later.`
+                );
             }
         } finally {
-            setLoading(prev => ({ ...prev, rooms: false }));
+            setLoading((prev) => ({ ...prev, rooms: false }));
         }
     };
 
     const fetchMaterials = async (libraryId: number) => {
         setMaterials([]);
-        setLoading(prev => ({ ...prev, materials: true }));
-    
+        setLoading((prev) => ({ ...prev, materials: true }));
+
         try {
-            console.log(`Fetching materials for library ${libraryId}...`);
+            // console.log(`Fetching materials for library ${libraryId}...`);
             const data = await getLibraryMaterials(libraryId);
-            console.log("Materials fetched:", data);
+            // console.log("Materials fetched:", data);
             setMaterials(data);
         } catch (err: any) {
-            console.error(`Error fetching materials for library ${libraryId}:`, err);
+            console.error(
+                `Error fetching materials for library ${libraryId}:`,
+                err
+            );
             setError(`Failed to load materials for library ${libraryId}.`);
         } finally {
-            setLoading(prev => ({ ...prev, materials: false }));
+            setLoading((prev) => ({ ...prev, materials: false }));
         }
     };
-    
 
     const selectLibrary = (library: Library | null) => {
-        console.log("Selecting library:", library?.id, library?.name);
+        // console.log("Selecting library:", library?.id, library?.name);
         // Only update if different from current selection
         if (library?.id !== selectedLibrary?.id) {
             setSelectedLibrary(library);
@@ -250,7 +281,7 @@ export const LibraryProvider: React.FC<{children: ReactNode}> = ({ children }) =
     };
 
     const selectFloor = (floor: Floor | null) => {
-        console.log("Selecting floor:", floor?.id, floor?.number);
+        // console.log("Selecting floor:", floor?.id, floor?.number);
         // Only update if different from current selection
         if (floor?.id !== selectedFloor?.id) {
             setSelectedFloor(floor);
@@ -261,82 +292,75 @@ export const LibraryProvider: React.FC<{children: ReactNode}> = ({ children }) =
     };
 
     const selectRoom = (room: Room | null) => {
-        console.log("Selecting room:", room?.room_id);
+        // console.log("Selecting room:", room?.room_id);
         setSelectedRoom(room);
     };
 
-
     /**
-     * Fetches detailed information for a specific room by its room_id 
-     * first checks if the room is already in state before making an API request 
+     * Fetches detailed information for a specific room by its room_id
+     * first checks if the room is already in state before making an API request
      * Implements fallback mechanisms for URL routing inconsistencies, these will
      * ideally be removed. I am new to Axios and had problems with URLs having /api/
      * prepended to all requests.
      *
-     * @param {string} roomId - The unique identifier for the room 
-     * @returns {Promise<Room | null>} Room data or null if not found 
+     * @param {string} roomId - The unique identifier for the room
+     * @returns {Promise<Room | null>} Room data or null if not found
      */
-    const getRoomById = async ( roomId: string ): Promise<Room | null> =>
-    {
-      // cache check logic
-      if ( selectedRoom?.room_id === roomId ) 
-      {
-        return selectedRoom;
-      }
-
-      const existingRoom = rooms.find( room => room.room_id === roomId );
-      if ( existingRoom ) 
-      {
-        return existingRoom;
-      }
-
-      // track whether we should update state ( for component unmounting )
-      let shouldUpdateState = true;
-
-      // set loading state once
-      setLoading( prev => ({ ...prev, singleRoom: true }) );
-
-      try 
-      {
-        console.log( `Attempting to fetch room ${roomId}` );
-
-        // try the normal API path first
-        try 
-        {
-          const response = await api.get( `/rooms/rooms/${roomId}/` );
-
-          // if we got here, the request was successful
-          console.log( `Successfully fetched room ${roomId}`, response.data );
-
-          // update loading state before returning result
-          if ( shouldUpdateState ) 
-          {
-            setLoading( prev => ({ ...prev, singleRoom: false }) );
-          }
-
-          return response.data;
-        }
-        catch ( requestError ) 
-        {
-          // safely handle all possible error types
-          console.error( `Request error for room ${roomId}:`, requestError );
-          throw requestError; // re-throw to be caught by outer catch block
-        }
-      }
-      catch ( err ) 
-      {
-        // safely handle all error types without accessing potentially undefined properties
-        console.error( `Error fetching room ${roomId}:`, err );
-
-        // set a generic error message
-        if ( shouldUpdateState ) 
-        {
-          setError( `Unable to load room ${roomId}. Please try again later.` );
-          setLoading( prev => ({ ...prev, singleRoom: false }) );
+    const getRoomById = async (roomId: string): Promise<Room | null> => {
+        // cache check logic
+        if (selectedRoom?.room_id === roomId) {
+            return selectedRoom;
         }
 
-        return null;
-      }
+        const existingRoom = rooms.find((room) => room.room_id === roomId);
+        if (existingRoom) {
+            return existingRoom;
+        }
+
+        // track whether we should update state ( for component unmounting )
+        let shouldUpdateState = true;
+
+        // set loading state once
+        setLoading((prev) => ({ ...prev, singleRoom: true }));
+
+        try {
+            // console.log( `Attempting to fetch room ${roomId}` );
+
+            // try the normal API path first
+            try {
+                const response = await api.get(`/rooms/rooms/${roomId}/`);
+
+                // if we got here, the request was successful
+                //   console.log( `Successfully fetched room ${roomId}`, response.data );
+
+                // update loading state before returning result
+                if (shouldUpdateState) {
+                    setLoading((prev) => ({ ...prev, singleRoom: false }));
+                }
+
+                return response.data;
+            } catch (requestError) {
+                // safely handle all possible error types
+                console.error(
+                    `Request error for room ${roomId}:`,
+                    requestError
+                );
+                throw requestError; // re-throw to be caught by outer catch block
+            }
+        } catch (err) {
+            // safely handle all error types without accessing potentially undefined properties
+            console.error(`Error fetching room ${roomId}:`, err);
+
+            // set a generic error message
+            if (shouldUpdateState) {
+                setError(
+                    `Unable to load room ${roomId}. Please try again later.`
+                );
+                setLoading((prev) => ({ ...prev, singleRoom: false }));
+            }
+
+            return null;
+        }
     };
 
     return (
@@ -355,7 +379,7 @@ export const LibraryProvider: React.FC<{children: ReactNode}> = ({ children }) =
                 selectFloor,
                 selectRoom,
                 refreshLibraries,
-                getRoomById
+                getRoomById,
             }}
         >
             {children}
@@ -366,8 +390,7 @@ export const LibraryProvider: React.FC<{children: ReactNode}> = ({ children }) =
 export const useLibrary = () => {
     const context = useContext(LibraryContext);
     if (context === undefined) {
-        throw new Error('useLibrary must be used within a LibraryProvider');
+        throw new Error("useLibrary must be used within a LibraryProvider");
     }
     return context;
 };
-

@@ -4,208 +4,214 @@
 
 /**
  * ReservationForm Component
- * 
+ *
  * Form component that allows users to create new room reservations.
  * Displays fields for reservation details (date/time, purpose, attendees),
  * validates user inputs, and submits the reservation request to the API.
- * 
+ *
  * @component
  * @requires React
  * @requires react-router-dom
  * @requires ../api/libraryService
- * 
+ *
  * @param {Object} props - Component props
  * @param {Room} props.room - Room object containing details of the room being reserved
  */
 
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { createReservation, Room } from '../api/libraryService';
-import { useAuth } from './AuthProvider';
+import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { createReservation, Room } from "../api/libraryService";
+import { useAuth } from "../contexts/AuthProvider";
 
-interface ReservationFormProps 
-{
-  room: Room;
+interface ReservationFormProps {
+    room: Room;
 }
 
-const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => 
-{
-  const navigate = useNavigate();
+const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
+    const navigate = useNavigate();
 
-  // state for form data, loading status, and error messages
-  const [formData, setFormData] = useState(
-  {
-    start_time: '',
-    end_time: '',
-    purpose: '',
-    num_attendees: 1,
-    notes: ''
-  });
-  const [loading, setLoading] = useState( false );
-  const [error, setError] = useState< string | null >( null );
+    // state for form data, loading status, and error messages
+    const [formData, setFormData] = useState({
+        start_time: "",
+        end_time: "",
+        purpose: "",
+        num_attendees: 1,
+        notes: "",
+    });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-  /**
-   * Updates form data state when input fields change 
-   * Handles conversion of number inputs from string to integer
-   *
-   * Sorry about the long function header...
-   *
-   * @param {ChangeEvent} e - Form input change change event 
-   */
-  const handleChange=(e: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement>) =>
-  {
-    const { name, value } = e.target;
-    setFormData( prev => ({
-      ...prev,
-      [name]: name === 'num_attendees' ? parseInt( value ) : value
-    }));
-  };
+    /**
+     * Updates form data state when input fields change
+     * Handles conversion of number inputs from string to integer
+     *
+     * Sorry about the long function header...
+     *
+     * @param {ChangeEvent} e - Form input change change event
+     */
+    const handleChange = (
+        e: React.ChangeEvent<
+            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >
+    ) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: name === "num_attendees" ? parseInt(value) : value,
+        }));
+    };
 
-  /**
-   * Handles form submission to create a new reservation
-   * Validates inputs and calls the createReservation API function 
-   *
-   * @param {React.FormEvent} e - Form submission event 
-   */
-  const handleSubmit = async ( e: React.FormEvent<EventTarget> ): Promise<void> => 
-  {
-    e.preventDefault();
-    setLoading( true );
-    setError( null );
+    /**
+     * Handles form submission to create a new reservation
+     * Validates inputs and calls the createReservation API function
+     *
+     * @param {React.FormEvent} e - Form submission event
+     */
+    const handleSubmit = async (
+        e: React.FormEvent<EventTarget>
+    ): Promise<void> => {
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
 
-    try
-    {
-      // call API to create the reservation 
-      const reservation = await createReservation(
-      {
-        room_id: room.room_id,
-        start_time: formData.start_time,
-        end_time: formData.end_time,
-        purpose: formData.purpose,
-        num_attendees: formData.num_attendees,
-        notes: formData.notes
-      });
+        try {
+            // call API to create the reservation
+            const reservation = await createReservation({
+                room_id: room.room_id,
+                start_time: formData.start_time,
+                end_time: formData.end_time,
+                purpose: formData.purpose,
+                num_attendees: formData.num_attendees,
+                notes: formData.notes,
+            });
 
-      if ( reservation )
-      {
-        // redirect to My Reservations page on success
-        navigate( '/my-reservations' );
-      }
-      else
-      {
-        setError( 'Failed to create reservation' );
-      }
-    }
-    catch( err )
-    {
-      setError( 'Error creating reservation' );
-      console.error( err );
-    }
-    finally
-    {
-      setLoading( false );
-    }
-  };
+            if (reservation) {
+                // redirect to My Reservations page on success
+                navigate("/my-reservations");
+            } else {
+                setError("Failed to create reservation");
+            }
+        } catch (err) {
+            setError("Error creating reservation");
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  // render the reservation form with inputs for date/time, purpose, attendees 
-  return(
-    <div className="bg-white p-6 rounded-lg shadow">
-      { /* form content */ }
-      <h2 className ="text-xl font-bold mb-4">Reserve Room {room.room_id}</h2>
+    // render the reservation form with inputs for date/time, purpose, attendees
+    return (
+        <div className="bg-white p-6 rounded-lg shadow">
+            {/* form content */}
+            <h2 className="text-xl font-bold mb-4">
+                Reserve Room {room.room_id}
+            </h2>
 
-      { error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          { error }
+            {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    {error}
+                </div>
+            )}
+
+            <form onSubmit={handleSubmit}>
+                <div className="mb-4">
+                    <label className="block text-gray-700 font-medium mb-2">
+                        Date and Time
+                    </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm text-gray-600">
+                                Start Time
+                            </label>
+                            <input
+                                type="datetime-local"
+                                name="start_time"
+                                value={formData.start_time}
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm text-gray-600">
+                                End Time
+                            </label>
+                            <input
+                                type="datetime-local"
+                                name="end_time"
+                                value={formData.end_time}
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded"
+                                required
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-gray-700 font-medium mb-2">
+                        Purpose
+                    </label>
+                    <input
+                        type="text"
+                        name="purpose"
+                        value={formData.purpose}
+                        onChange={handleChange}
+                        placeholder="Study session, meeting, etc."
+                        className="w-full p-2 border rounded"
+                    />
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-gray-700 font-medium mb-2">
+                        Number of Attendees (Max: {room.capacity})
+                    </label>
+                    <input
+                        type="number"
+                        name="num_attendees"
+                        value={formData.num_attendees}
+                        onChange={handleChange}
+                        min="1"
+                        max={room.capacity}
+                        className="w-full p-2 border rounded"
+                        required
+                    />
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-gray-700 font-medium mb-2">
+                        Additional Notes
+                    </label>
+                    <textarea
+                        name="notes"
+                        value={formData.notes}
+                        onChange={handleChange}
+                        className="w-full p-2 border rounded"
+                        rows={3}
+                    />
+                </div>
+
+                <div className="flex justify-end">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            window.history.back();
+                        }}
+                        className="mr-2 px-4 py-2 text-gray-600 rounded border"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
+                    >
+                        {loading ? "Submitting..." : "Reserve Room"}
+                    </button>
+                </div>
+            </form>
         </div>
-      )}
-
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 font-medium mb-2">Date and Time</label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-gray-600">Start Time</label>
-              <input
-                type="datetime-local"
-                name="start_time"
-                value={formData.start_time}
-                onChange={handleChange}
-                className="w-full p-2 border rounded"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600">End Time</label>
-              <input
-                type="datetime-local"
-                name="end_time"
-                value={formData.end_time}
-                onChange={handleChange}
-                className="w-full p-2 border rounded"
-                required
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-gray-700 font-medium mb-2">Purpose</label>
-          <input
-            type="text"
-            name="purpose"
-            value={formData.purpose}
-            onChange={handleChange}
-            placeholder="Study session, meeting, etc."
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-gray-700 font-medium mb-2">
-            Number of Attendees (Max: {room.capacity})
-          </label>
-          <input
-            type="number"
-            name="num_attendees"
-            value={formData.num_attendees}
-            onChange={handleChange}
-            min="1"
-            max={room.capacity}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-gray-700 font-medium mb-2">Additional Notes</label>
-          <textarea
-            name="notes"
-            value={formData.notes}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-            rows={3}
-          />
-        </div>
-
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={() => {window.history.back()}}
-            className="mr-2 px-4 py-2 text-gray-600 rounded border"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
-          >
-            {loading ? 'Submitting...' : 'Reserve Room'}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
+    );
 };
 
 export default ReservationForm;

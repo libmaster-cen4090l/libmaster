@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import api from "@/api/axiosInstance";
-import { useAuth } from "@/components/AuthProvider";
+import { useAuth } from "@/contexts/AuthProvider";
 
 function Logout() {
     const auth = useAuth();
