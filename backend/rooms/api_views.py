@@ -8,15 +8,20 @@ from .models import Library, Floor, Room, Reservation, Material
 from .serializers import LibrarySerializer, FloorSerializer, RoomSerializer, ReservationSerializer, RoomAvailabilitySerializer, MaterialSerializer
 from django.http import JsonResponse
 
+
 # ViewSets for browsing (no authentication required)
 class LibraryViewSet(viewsets.ReadOnlyModelViewSet):
+
     """
     API endpoint for listing libraries.
     No authentication required for read-only access.
     """
+
     queryset = Library.objects.all()
     serializer_class = LibrarySerializer
     permission_classes = [permissions.AllowAny]
+
+
 
 class FloorViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -34,6 +39,7 @@ class FloorViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(library_id=library_id)
         return queryset
 
+
 class RoomViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint for listing rooms.
@@ -42,6 +48,7 @@ class RoomViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
     permission_classes = [permissions.AllowAny]
+    lookup_field = 'room_id' # lookups now by room_id , not pk
     
     def get_queryset(self):
         queryset = Room.objects.all()
@@ -52,6 +59,7 @@ class RoomViewSet(viewsets.ReadOnlyModelViewSet):
         if status is not None:
             queryset = queryset.filter(status=status)
         return queryset
+
 
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
@@ -97,6 +105,7 @@ def check_room_availability(request, room_id):
         "reservations": serializer.data
     })
 
+
 # Reservation management (requires authentication)
 class ReservationViewSet(viewsets.ModelViewSet):
     """
@@ -117,6 +126,28 @@ class ReservationViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def create(self, request, *args, **kwargs):
+        data = request.data.copy()
+
+        # check if room is provided as a string room_id
+        if 'room' in data and isinstance(data['room'], str) and not data['room'].isdigit():
+            try:
+                # find room by room_id
+                room = Room.objects.get( room_id=data['room'] )
+                data['room'] = room.pk  # replace with actual primary key
+            except Room.DoesNotExist:
+                return Response(
+                    {"error": f"Room with ID '{data['room']}' not found"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
 
 class MaterialViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = MaterialSerializer
@@ -124,8 +155,6 @@ class MaterialViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         library_id = self.kwargs.get('library_id')
         return Material.objects.filter(library_id=library_id)
-
-
 
 
 def demo_view(request):
@@ -161,3 +190,25 @@ def demo_view(request):
         },
         "sample_rooms": sample_rooms
     })
+
+# Update room_detail view to support lookup by old or new format
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def room_detail(request, room_id):
+    """
+    Get detailed information about a specific room by its room_id.
+    Supports both old and new format room IDs for backward compatibility.
+    """
+    try:
+        room = Room.objects.get(room_id=room_id)
+        serializer = RoomSerializer(room)
+        return Response(serializer.data)
+    except Room.DoesNotExist:
+        # Debug: Print all available room_ids to help diagnose
+        all_room_ids = Room.objects.values_list('room_id', flat=True)
+        print(f"Available room_ids: {list(all_room_ids)}")
+        
+        return Response(
+            {"error": f"Room with ID '{room_id}' not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )

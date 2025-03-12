@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useAuth } from "@/components/AuthProvider";
+import { useAuth } from "@/contexts/AuthProvider";
 import { Link, Navigate } from "react-router-dom";
 
 function Login() {
@@ -12,13 +12,13 @@ function Login() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!formData.email || !formData.password) {
             return;
         }
-        
+
         setIsSubmitting(true);
-        
+
         try {
             if (auth.login) {
                 await auth.login(formData);
@@ -42,15 +42,18 @@ function Login() {
                 <p className="text-center text-gray-600 mb-6">
                     Your FSU library study room reservation system
                 </p>
-                
+
                 {/* Signup Option for New Users */}
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                    <h2 className="font-semibold text-blue-800 mb-1">New to LibMaster?</h2>
+                    <h2 className="font-semibold text-blue-800 mb-1">
+                        New to LibMaster?
+                    </h2>
                     <p className="text-blue-700 text-sm mb-2">
-                        Create an account to start reserving study rooms at the FSU library.
+                        Create an account to start reserving study rooms at the
+                        FSU library.
                     </p>
-                    <Link 
-                        to="/signup" 
+                    <Link
+                        to="/signup"
                         className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-md font-medium transition-colors duration-200"
                     >
                         Sign up now
@@ -67,10 +70,13 @@ function Login() {
                         </span>
                     </div>
                 </div>
-                
+
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                            htmlFor="email"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                             Email
                         </label>
                         <input
@@ -81,14 +87,20 @@ function Login() {
                             placeholder="fsuid@fsu.edu"
                             value={formData.email || ""}
                             onChange={(e) => {
-                                setFormData({ ...formData, email: e.target.value });
+                                setFormData({
+                                    ...formData,
+                                    email: e.target.value,
+                                });
                             }}
                             required
                         />
                     </div>
-                    
+
                     <div className="mb-6">
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                            htmlFor="password"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
                             Password
                         </label>
                         <input
@@ -107,13 +119,13 @@ function Login() {
                             required
                         />
                     </div>
-                    
+
                     {auth.errors.incorrectCredentials && (
                         <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
                             Incorrect email or password. Please try again.
                         </div>
                     )}
-                    
+
                     <button
                         className="block bg-gray-800 hover:bg-gray-900 w-full p-2.5 text-white rounded-lg text-base font-semibold transition-colors duration-200 disabled:bg-gray-400"
                         type="submit"
