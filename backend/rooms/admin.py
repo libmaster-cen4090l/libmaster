@@ -30,10 +30,10 @@ class FloorAdmin( admin.ModelAdmin ):
 @admin.register( Room )
 class RoomAdmin( admin.ModelAdmin ):
     # Update the list_display to include room_number
-    list_display = ('room_id', 'room_number', 'floor', 'capacity', 'status')
+    list_display = ('room_id', 'room_number', 'floor', 'capacity', 'is_graduate_only', 'status')
 
     # Add filters for the new fields
-    list_filter = ('floor__library', 'floor', 'status', 'has_whiteboard', 'has_monitor')
+    list_filter = ('floor__library', 'floor', 'is_graduate_only', 'status', 'has_whiteboard', 'has_monitor')
 
     # Search by both room_id and room_number
     search_fields = ('room_id', 'room_number', 'floor__library__name')
@@ -42,7 +42,7 @@ class RoomAdmin( admin.ModelAdmin ):
     fieldsets = (
         # Basic room information section - ADD room_number here
         (None, {
-            'fields': ('room_number', 'floor', 'capacity', 'status')
+            'fields': ('room_number', 'floor', 'capacity', 'is_graduate_only', 'status')
         }),
         # Amenities section
         ('Amenities', {

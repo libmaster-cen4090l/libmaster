@@ -144,6 +144,7 @@ class Room(models.Model):
     # each room belongs to a specific floor
     floor = models.ForeignKey(Floor, on_delete=models.CASCADE, related_name="rooms")
     capacity = models.IntegerField(help_text="Maximum number of people allowed")
+    is_graduate_only = models.BooleanField(default=False)
 
     # Room amenities
     has_whiteboard = models.BooleanField(default=False)
