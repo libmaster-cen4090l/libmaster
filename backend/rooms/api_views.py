@@ -146,7 +146,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
                 if room.is_graduate_only and not user_is_grad:
                     return Response(
-                        {"error": "This room is availiabe only to graduate studnets."},
+                        {"error": "This room is available only to graduate students."},
                         status=status.HTTP_403_FORBIDDEN
                     )
             except Room.DoesNotExist:
