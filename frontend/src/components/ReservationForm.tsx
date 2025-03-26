@@ -20,8 +20,10 @@
 
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import DatePicker from "react-datepicker";
 import { createReservation, Room } from "../api/libraryService";
 import { useAuth } from "../contexts/AuthProvider";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface ReservationFormProps {
     room: Room;
@@ -31,9 +33,10 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
     const navigate = useNavigate();
 
     // state for form data, loading status, and error messages
+    // -- Modified state to use Date objects instead of strings
     const [formData, setFormData] = useState({
-        start_time: "",
-        end_time: "",
+        start_time: null as Date | null,
+        end_time: null as Date | null,
         purpose: "",
         num_attendees: 1,
         notes: "",
@@ -50,15 +53,37 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
      * @param {ChangeEvent} e - Form input change change event
      */
     const handleChange = (
-        e: React.ChangeEvent<
-            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-        >
+          e: React.ChangeEvent< 
+              HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement >
     ) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
             ...prev,
             [name]: name === "num_attendees" ? parseInt(value) : value,
         }));
+    };
+
+    /**
+     * Handles date changes for react-datepicker
+     *
+     */
+     const handleDateChange = ( date: Date | null, field: 'start_time' | 'end_time' ) =>
+     {
+       setFormData( prev => (
+       {
+         ...prev,
+         [field]: date
+       }));
+     };
+
+    /**
+     * Format dates for API submission
+     */
+    const formatDateForAPI = ( date: Date | null ): string =>
+    {
+      if ( !date )
+        return '';
+      return date.toISOString();
     };
 
     /**
@@ -78,8 +103,8 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
             // call API to create the reservation
             const reservation = await createReservation({
                 room_id: room.room_id,
-                start_time: formData.start_time,
-                end_time: formData.end_time,
+                start_time: formatDateForAPI( formData.start_time ),
+                end_time: formatDateForAPI( formData.end_time ),
                 purpose: formData.purpose,
                 num_attendees: formData.num_attendees,
                 notes: formData.notes,
@@ -144,26 +169,30 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
                             <label className="block text-sm text-gray-600">
                                 Start Time
                             </label>
-                            <input
-                                type="datetime-local"
-                                name="start_time"
-                                value={formData.start_time}
-                                onChange={handleChange}
+                            <DatePicker
+                                selected={formData.start_time}
+                                onChange={(date) => handleDateChange( date, 'start_time' )}
+                                showTimeSelect
+                                timeIntervals={5}
+                                dateFormat="MMMM d, yyyy h:mm aa"
                                 className="w-full p-2 border rounded"
                                 required
+                                placeholderText="Select start date and time"
                             />
                         </div>
                         <div>
                             <label className="block text-sm text-gray-600">
                                 End Time
                             </label>
-                            <input
-                                type="datetime-local"
-                                name="end_time"
-                                value={formData.end_time}
-                                onChange={handleChange}
+                            <DatePicker
+                                selected={formData.end_time}
+                                onChange={(date) => handleDateChange( date, 'end_time' )}
+                                showTimeSelect
+                                timeIntervals={5}
+                                dateFormat="MMMM d, yyyy h:mm aa"
                                 className="w-full p-2 border rounded"
                                 required
+                                placeholderText="Select end date and time"
                             />
                         </div>
                     </div>
