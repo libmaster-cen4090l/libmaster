@@ -52,12 +52,19 @@ class RoomViewSet(viewsets.ReadOnlyModelViewSet):
     
     def get_queryset(self):
         queryset = Room.objects.all()
+        user = self.request.user
+
         floor_id = self.request.query_params.get('floor', None)
         if floor_id is not None:
             queryset = queryset.filter(floor_id=floor_id)
+
         status = self.request.query_params.get('status', None)
         if status is not None:
             queryset = queryset.filter(status=status)
+
+        if not user.groups.filter(name='Graduate Students').exists():
+            queryset = queryset.filter(is_graduate_only=False)
+
         return queryset
 
 
@@ -134,7 +141,14 @@ class ReservationViewSet(viewsets.ModelViewSet):
             try:
                 # find room by room_id
                 room = Room.objects.get( room_id=data['room'] )
+                user_is_grad = self.request.user.groups.filter(name='Graduate Students').exists()
                 data['room'] = room.pk  # replace with actual primary key
+
+                if room.is_graduate_only and not user_is_grad:
+                    return Response(
+                        {"error": "This room is available only to graduate students."},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
             except Room.DoesNotExist:
                 return Response(
                     {"error": f"Room with ID '{data['room']}' not found"},

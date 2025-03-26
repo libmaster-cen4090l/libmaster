@@ -121,7 +121,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             });
             setToken(response.data.access);
         } catch (e) {
-            if (e instanceof AxiosError && e.status == 401)
+            if (e instanceof AxiosError)
                 setErrors({ ...errors, incorrectCredentials: true });
             setToken(null);
         }
@@ -184,11 +184,15 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         const authResponseInterceptor = api.interceptors.response.use(
             (response) => response,
             async (error) => {
-                const originalRequestConfig: CustomAxiosRequestConfig =
-                    error.config;
+                const originalRequestConfig =
+                    error.config as CustomAxiosRequestConfig;
 
                 // Check if this is an auth error AND we haven't tried refreshing yet
-                if (error.status === 401) {
+                if (
+                    error.response?.status === 401 &&
+                    originalRequestConfig._retry != true &&
+                    !originalRequestConfig.url?.includes("auth/token/refresh/")
+                ) {
                     try {
                         // Mark this request as retried to prevent potential loops
                         originalRequestConfig._retry = true;
