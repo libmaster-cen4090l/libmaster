@@ -26,8 +26,10 @@ class RoomSerializer(serializers.ModelSerializer):
             'room_id', 'room_number', 'floor', 'library_name', 'library_code', 
             'floor_number', 'display_name', 'location_description',
             'capacity', 'has_whiteboard', 'has_monitor', 'has_window',
-            'status', 'position_x', 'position_y', 'width', 'height'
-        ]
+            'status', 'position_x', 'position_y', 'width', 'height',
+            'is_graduate_only', 'requires_admin_approval'
+        ] # added is_graduate_only and requires_admin_approval for exposing
+          # room permission fields to frontend
 
 class ReservationSerializer(serializers.ModelSerializer):
     room_id = serializers.CharField(source='room.room_id', read_only=True)

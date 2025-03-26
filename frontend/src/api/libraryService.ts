@@ -26,6 +26,8 @@ export interface Room {
     has_whiteboard: boolean;
     has_monitor: boolean;
     has_window: boolean;
+    is_graduate_only: boolean;
+    requires_admin_approval: boolean;
     status: "available" | "maintenance" | "closed";
     position_x?: number;
     position_y?: number;

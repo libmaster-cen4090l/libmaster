@@ -234,7 +234,7 @@ const LibraryBrowser: React.FC = () => {
                                             <p className="text-sm text-gray-600">
                                                 Capacity: {room.capacity}
                                             </p>
-                                            <div className="flex space-x-2 text-xs mt-1">
+                                            <div className="flex flex-wrap gap-1 text-xs mt-1">
                                                 {room.has_whiteboard && (
                                                     <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
                                                         Whiteboard
@@ -248,6 +248,16 @@ const LibraryBrowser: React.FC = () => {
                                                 {room.has_window && (
                                                     <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
                                                         Window
+                                                    </span>
+                                                )}
+                                                {room.is_graduate_only && (
+                                                    <span className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded">
+                                                        Grad Only
+                                                    </span>
+                                                )}
+                                                {room.requires_admin_approval && (
+                                                    <span className="bg-amber-100 text-amber-800 px-2 py-1 rounded">
+                                                        Approval Req.
                                                     </span>
                                                 )}
                                             </div>

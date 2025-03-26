@@ -106,7 +106,28 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
             <h2 className="text-xl font-bold mb-4">
                 Reserve Room {room.room_id}
             </h2>
-
+            {room.requires_admin_approval && (
+                <div className="bg-amber-50 border-1-4 border-amber-400 p-4 mb-4">
+                    <div className="flex">
+                        <div className="ml-3">
+                            <p className="text-sm text-amber-700">
+                                This room requires administrator approval. Your reservation will be pending until approved by library staff.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {room.is_graduate_only && (
+                <div className="bg-indigo-50 border-1-4 border-indigo-400 p-4 mb-4">
+                    <div className="flex">
+                        <div className="ml-3">
+                            <p className="text-sm text-indigo-700">
+                                This room is reserved for graduate students only.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
             {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                     {error}

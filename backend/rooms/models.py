@@ -80,7 +80,13 @@ class Library(models.Model):
 
     def clean(self):
         super().clean()
-        # Validate library code format
+        # first, validate library name len, must be at least 4 chars long
+        if len( self.name ) < 4:
+            raise ValidationError({
+                'name': "Library name must be at least 4 characters long."
+            })
+
+        # second, validate library code format
         if self.code:
             if not re.match(r'^[A-Z][A-Z0-9]{2,9}$', self.code):
                 raise ValidationError({
@@ -144,12 +150,21 @@ class Room(models.Model):
     # each room belongs to a specific floor
     floor = models.ForeignKey(Floor, on_delete=models.CASCADE, related_name="rooms")
     capacity = models.IntegerField(help_text="Maximum number of people allowed")
-    is_graduate_only = models.BooleanField(default=False)
 
     # Room amenities
     has_whiteboard = models.BooleanField(default=False)
     has_monitor = models.BooleanField(default=False)
     has_window = models.BooleanField(default=False)
+
+    # Room permissions
+    is_graduate_only = models.BooleanField(
+            default=False,
+            help_text="If enabled, reservations for room may only be placed by Graduate students"
+    )
+    requires_admin_approval = models.BooleanField(
+            default=False,
+            help_text="If enabled, reservations for room require administrator approval prior to confirmation"
+    )
 
     # for interactive floor map (define positions, width, height)
     position_x = models.FloatField(null=True, blank=True, help_text="X coordinate on floor map")
