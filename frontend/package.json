@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/react-datepicker": "^7.0.0",
     "axios": "^1.7.9",
     "react": "^18.2.0",
+    "react-datepicker": "^8.2.1",
     "react-dom": "^18.2.0",
     "react-router": "^7.2.0",
     "react-router-dom": "^7.2.0"

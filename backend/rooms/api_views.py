@@ -130,8 +130,15 @@ class ReservationViewSet(viewsets.ModelViewSet):
         # Staff can see all reservations
         return Reservation.objects.all()
     
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    # modified by Dylan to support room permissions
+    def perform_create( self, serializer ):
+        room = Room.objects.get( pk=serializer.validated_data['room'].pk )
+
+        # set default status based on room properties
+        initial_status = 'pending' if room.requires_admin_approval else 'confirmed'
+
+        # publish the newly created reservation and its status
+        serializer.save( user=self.request.user, status=initial_status )
 
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
