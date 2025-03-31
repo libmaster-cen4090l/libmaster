@@ -113,11 +113,15 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
             if (reservation) {
                 // redirect to My Reservations page on success
                 navigate("/my-reservations");
-            } else {
-                setError("Failed to create reservation");
             }
-        } catch (err) {
-            setError("Error creating reservation");
+        } catch (err: any) {
+            //show detailed error messages
+            if (err.response && err.response.data) {
+                const messages = Object.values(err.response.data).flat().join('\n');
+                setError(`Unable to create reservation:\n${messages}`);
+            } else {
+                setError("Error creating reservation");
+            }
             console.error(err);
         } finally {
             setLoading(false);
@@ -155,7 +159,7 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
             )}
             {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                    {error}
+                     <pre className="whitespace-pre-wrap">{error}</pre>
                 </div>
             )}
 

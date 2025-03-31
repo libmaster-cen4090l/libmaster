@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Library, Floor, Room, Reservation, Material
+from .models import Library, Floor, Room, Reservation, Material, is_library_open
 
 class LibrarySerializer(serializers.ModelSerializer):
     class Meta:
@@ -43,6 +43,23 @@ class ReservationSerializer(serializers.ModelSerializer):
             'num_attendees', 'notes', 'created_at', 'modified_at'
         ]
         read_only_fields = ['reservation_id', 'user', 'created_at', 'modified_at']
+    def validate (self, data):
+        room = data.get('room')
+        start_time = data.get('start_time')
+        end_time = data.get('end_time')
+
+        if not room or not start_time or not end_time:
+            raise serializers.ValidationError("Room, start time, and end time are required.")
+
+        library = room.floor.library
+
+        if not is_library_open(library, start_time):
+            raise serializers.ValidationError(f"{library.name} is closed at your reservation start time.")
+
+        if not is_library_open(library, end_time):
+            raise serializers.ValidationError(f"{library.name} is closed at your reservation end time.")
+
+        return data
 
 
 class RoomAvailabilitySerializer(serializers.Serializer):

@@ -223,7 +223,7 @@ export const createReservation = async (reservationData: {
             }
         }
 
-        return null;
+        throw error;
     }
 };
 
