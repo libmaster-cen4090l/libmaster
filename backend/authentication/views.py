@@ -1,5 +1,5 @@
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework import status
+from rest_framework import status, permissions # added permissions import
 from .serializers import UserSerializer
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -41,6 +41,23 @@ def logout(request):
     response = Response({"message": "Logged out succesfully!"}, status=status.HTTP_200_OK)
     response.delete_cookie('refresh_token')
     return response
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def user_info( request ):
+    """ 
+    Return information about the authenticated user, including
+    graduate student status.
+    """
+    user = request.user
+    is_grad_student = user.groups.filter(name='Graduate Students').exists()
+
+    return Response({
+        'username': user.username,
+        'email': user.email,
+        'is_grad_student': is_grad_student,
+        'groups': [group.name for group in user.groups.all()]
+    })
 
 # HTTP-only cookie workaround (https://github.com/jazzband/djangorestframework-simplejwt/issues/71#issuecomment-1380751960)
 class CookieTokenRefreshSerializer(TokenRefreshSerializer):
