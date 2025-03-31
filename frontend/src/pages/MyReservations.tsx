@@ -19,6 +19,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthProvider";
 import api from "../api/axiosInstance";
 import { Reservation } from "../api/libraryService";
+import { cancelReservation as cancelReservationApi } from "../api/libraryService";
 
 const MyReservations: React.FC = () => {
     // state management for reservations, loading sttus, and errors
@@ -77,20 +78,20 @@ const MyReservations: React.FC = () => {
         if (!confirm("Are you sure you want to cancel this reservation?")) {
             return;
         }
-
+        // use libraryservice's cancellation function instead of http patch
         try {
-            await api.patch(`/rooms/reservations/${reservationId}/`, {
-                status: "cancelled",
-            });
+          const success = await cancelReservationApi(reservationId);
 
-            // Update the local state
+          if (success) {
+            // update the local state
             setReservations((prevReservations) =>
                 prevReservations.map((res) =>
                     res.reservation_id === reservationId
-                        ? { ...res, status: "cancelled" }
-                        : res
+                    ? { ...res, status: "cancelled" }
+                    : res
                 )
             );
+          }
         } catch (err) {
             alert("Failed to cancel reservation");
             console.error(err);

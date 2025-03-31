@@ -43,7 +43,18 @@ class ReservationSerializer(serializers.ModelSerializer):
             'num_attendees', 'notes', 'created_at', 'modified_at'
         ]
         read_only_fields = ['reservation_id', 'user', 'created_at', 'modified_at']
-    def validate (self, data):
+
+    def validate(self, data):
+        # for partial updates like status changes, skip validation if not changing core fields
+        request = self.context.get('request')
+
+        # if PATCH request and not updating core reservation details
+        if request and request.method == 'PATCH':
+            # if we're only updating status or other non-core fields
+            if not any(field in data for field in ['room', 'start_time', 'end_time']):
+                return data
+
+        # standard validation for new reservations or time/room changes
         room = data.get('room')
         start_time = data.get('start_time')
         end_time = data.get('end_time')
