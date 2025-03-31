@@ -2,14 +2,18 @@
 # Purpose: Define the Administration interface
 # Modified: 2/28/2025 @ 9:21:19 PM EST
 from django.contrib import admin
-from .models import Library, Floor, Room, Reservation, Material
+from .models import Library, Floor, Room, Reservation, Material, LibrarySchedule
 
 """
 Django's admin interface provides a built-in way to manage our application data
 It automatically creates UI for viewing, adding, editing, and deleting records
 The configuration below customizes how each model appears in the admin interface
 """
-
+class LibraryScheduleInline(admin.TabularInline):
+    # helps display librrary schedules
+    model = LibrarySchedule
+    extra = 1  # Adds one empty form by default
+    ordering = ('day_of_week', 'open_time')
 @admin.register( Library ) # this decorator registers the model with the admin site
 class LibraryAdmin( admin.ModelAdmin ):
     # controls which fields appear as columns in the list view
@@ -19,7 +23,8 @@ class LibraryAdmin( admin.ModelAdmin ):
     search_fields = ( 'name', 'location' )
 
     # with this config, admins can easily see library hours and search by name
-
+    #display the library schedules
+    inlines = [LibraryScheduleInline]
 @admin.register( Floor )
 class FloorAdmin( admin.ModelAdmin ):
     # these fields will show as columns in the floors list
@@ -149,3 +154,4 @@ class MaterialAdmin(admin.ModelAdmin):
     list_filter = ("library", "name")  
     search_fields = ("id", "name", "library__name")  
     ordering = ("library", "name")
+

@@ -391,3 +391,36 @@ class Material(models.Model):
 
     def __str__(self):
         return f"{self.get_name_display()} - {self.library.name}"
+
+class LibrarySchedule(models.Model):
+    '''A model that defines the open and close times of a library'''
+    DAYS_OF_WEEK = [
+        (0, 'Monday'),
+        (1, 'Tuesday'),
+        (2, 'Wednesday'),
+        (3, 'Thursday'),
+        (4, 'Friday'),
+        (5, 'Saturday'),
+        (6, 'Sunday'),
+    ]
+
+    library = models.ForeignKey(Library, on_delete=models.CASCADE, related_name='schedules')
+    day_of_week = models.IntegerField(choices=DAYS_OF_WEEK)
+    open_time = models.TimeField()
+    close_time = models.TimeField()
+
+def is_library_open(library, reservation_datetime):
+    '''A function to check if a library is open'''
+    day_of_week = reservation_datetime.weekday()
+    reservation_time = reservation_datetime.time()
+    
+    schedules = LibrarySchedule.objects.filter(
+        library=library, 
+        day_of_week=day_of_week
+    )
+    
+    for schedule in schedules:
+        if schedule.open_time <= reservation_time < schedule.close_time:
+            return True
+    return False
+
