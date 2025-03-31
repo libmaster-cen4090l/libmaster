@@ -222,6 +222,16 @@ def room_detail(request, room_id):
     """
     try:
         room = Room.objects.get(room_id=room_id)
+
+        # added validation for preventing non-grads from accessing grad rooms
+        if room.is_graduate_only and (
+        not request.user.is_authenticated or
+        not request.user.groups.filter(name='Graduate Students').exists ):
+            return Response(
+                {"error": "This room is available only to graduate students."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
         serializer = RoomSerializer(room)
         return Response(serializer.data)
     except Room.DoesNotExist:

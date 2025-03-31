@@ -24,7 +24,8 @@ import {
 } from "react";
 import api from "../api/axiosInstance";
 
-enum Role {
+// changed to export to expose in ReservationForm.tsx
+export enum Role {
     UNDERGRAD,
     GRAD,
     ADMIN,
@@ -85,6 +86,26 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         incorrectCredentials: false,
     });
 
+    // added to facilitate enforcement of grad-only rooms
+    const fetchUserInfo = async () => {
+      if (!token) return;
+
+      try {
+        const response = await api.get('/auth/user-info/');
+
+        // determine role based on user info
+        if (response.data.is_grad_student) {
+          setRole(Role.GRAD);
+        } else {
+          setRole(Role.UNDERGRAD);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user info:', error);
+        // on error, default to low permissions (undergrad) for safety
+        setRole(Role.UNDERGRAD);
+      }
+    };
+
     const clearTokenFunction = () => {
         setToken(null);
     };
@@ -101,6 +122,8 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 password: form.password,
             });
             setToken(response.data.access);
+            // fetch user info after successful login
+            await fetchUserInfo();
         } catch (e) {
             if (e instanceof AxiosError && e.status == 401)
                 setErrors({ ...errors, incorrectCredentials: true });
@@ -127,6 +150,15 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         }
     };
 
+    // call fetchUserInfo when token changes or on app initialization
+    useEffect(() => {
+      if (token) {
+        fetchUserInfo();
+      } else {
+        setRole(null);
+      }
+    }, [token]);
+
     /**
      * Attempts to refresh the authentication token on page load/refresh
      * This ensures user sessions persist across page reloads (while working
@@ -144,6 +176,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                     "auth/token/refresh/"
                 );
                 setToken(response.data.access);
+                // user info will be fetched by the token effect above
             } catch (error) {
                 // if refresh fails, redirect to login
                 setToken(null);
@@ -222,7 +255,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         <AuthContext.Provider
             value={{
                 token: token,
-                role: null,
+                role: role,
                 errors: errors,
                 clearToken: clearTokenFunction,
                 login: login,

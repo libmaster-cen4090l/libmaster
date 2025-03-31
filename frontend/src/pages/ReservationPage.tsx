@@ -24,7 +24,7 @@
  */
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, Navigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthProvider";
+import { useAuth, Role } from "../contexts/AuthProvider";
 import { useLibrary } from "../contexts/LibraryContext";
 import { Room } from "../api/libraryService";
 import ReservationForm from "../components/ReservationForm";
@@ -73,6 +73,13 @@ const ReservationPage: React.FC = () => {
                 const roomData = await getRoomById(roomId);
 
                 if (roomData) {
+                    // check if room is graduate-only and user is not a graduate student
+                    if (roomData.is_graduate_only && auth.role !== Role.GRAD) {
+                        setLocalError("This room is reserved for graduate students only.");
+                        setLoading(false);
+                        return;
+                    }
+
                     setRoom(roomData);
                     setLocalError(null);
                 } else {
@@ -90,7 +97,7 @@ const ReservationPage: React.FC = () => {
         }
 
         fetchRoomData();
-    }, [roomId]); // ONLY depend on roomId
+    }, [roomId, auth.role]); // include auth.role in dependencies
 
     // show loading state while fetching room data
     if (loading) {
