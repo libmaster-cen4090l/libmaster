@@ -79,22 +79,22 @@ const LibraryBrowser: React.FC = () => {
                 <h1 className="text-3xl font-bold text-gray-900">
                     Library Study Rooms
                 </h1>
-                <div className="flex gap-4">
+                <div className="flex max-h-10 gap-3">
                     <Link
                         to="/my-reservations"
-                        className="bg-green-500 shadow hover:bg-green-600 text-white px-4 py-2 rounded"
+                        className="bg-emerald-400 text-center shadow hover:bg-emerald-500 text-white px-4 max-h-10 min-w-40 transition-colors py-2 rounded-lg"
                     >
                         My Reservations
                     </Link>
                     <button
                         onClick={() => refreshLibraries()}
-                        className="bg-blue-500 shadow hover:bg-blue-600 text-white px-4 py-2 rounded"
+                        className="bg-blue-400 shadow hover:bg-blue-500 text-white px-4 transition-colors py-2 rounded-lg"
                     >
                         Refresh
                     </button>
                     <Link
                         to="/logout"
-                        className="bg-gray-500 shadow hover:bg-gray-600 text-white px-4 py-2 rounded"
+                        className="bg-gray-400 shadow hover:bg-slate-500 text-white px-4 transition-colors py-2 rounded-lg"
                     >
                         Logout
                     </Link>
