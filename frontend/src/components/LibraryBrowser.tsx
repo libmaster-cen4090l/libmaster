@@ -122,7 +122,7 @@ const LibraryBrowser: React.FC = () => {
                             {libraries.map((library) => (
                                 <li
                                     key={library.id}
-                                    className={`p-3 rounded-md cursor-pointer transition-colors duration-200
+                                    className={`p-3 h-16 rounded-md cursor-pointer transition-colors duration-200
                                         ${
                                             selectedLibrary?.id === library.id
                                                 ? "bg-blue-100 border-l-4 border-blue-500"
@@ -174,7 +174,7 @@ const LibraryBrowser: React.FC = () => {
                             {floors.map((floor) => (
                                 <li
                                     key={floor.id}
-                                    className={`p-3 rounded-md cursor-pointer transition-colors duration-200 
+                                    className={`p-3 rounded-md h- cursor-pointer transition-colors duration-200 
                                         ${
                                             selectedFloor?.id === floor.id
                                                 ? "bg-blue-100 border-l-4 border-blue-500"
@@ -198,7 +198,7 @@ const LibraryBrowser: React.FC = () => {
 
                 {/* Time Picker Column */}
                 <div className="bg-white p-6 rounded-lg shadow">
-                    <h2 className="text-xl font-semibold mb-6 text-gray-800">
+                    <h2 className="text-xl font-semibold mb-4 text-gray-800">
                         Reservation Time
                     </h2>
 
@@ -207,7 +207,7 @@ const LibraryBrowser: React.FC = () => {
                             Please select a library first
                         </p>
                     ) : (
-                        <div className="flex gap-2">
+                        <div className="flex w-full">
                             <DatePicker
                                 selected={selectedStartTime}
                                 onChange={(date) => {
@@ -224,8 +224,8 @@ const LibraryBrowser: React.FC = () => {
                                 showTimeSelect
                                 timeIntervals={5}
                                 dateFormat="MMMM d, h:mm aa"
-                                wrapperClassName="w-full"
-                                className="block w-full space-y-2 p-2 rounded-lg shadow"
+                                wrapperClassName=""
+                                className="text-center w-full border-blue-300 select-none border-4 border-r-0 flex p-2 rounded-r-none rounded-lg"
                                 required
                                 includeDateIntervals={[
                                     {
@@ -249,8 +249,8 @@ const LibraryBrowser: React.FC = () => {
                                 showTimeSelect
                                 timeIntervals={5}
                                 dateFormat="MMMM d, h:mm aa"
-                                wrapperClassName="w-full"
-                                className="block w-full space-y-2 p-2 rounded-lg shadow"
+                                wrapperClassName=""
+                                className="block border-blue-300 w-full border-4 select-none text-center rounded-l-none p-2 rounded-lg"
                                 required
                                 includeDateIntervals={[
                                     {
