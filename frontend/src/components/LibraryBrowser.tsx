@@ -223,7 +223,7 @@ const LibraryBrowser: React.FC = () => {
                                 }}
                                 showTimeSelect
                                 timeIntervals={5}
-                                dateFormat="MMMM d, yyyy h:mm aa"
+                                dateFormat="MMMM d, h:mm aa"
                                 wrapperClassName="w-full"
                                 className="block w-full space-y-2 p-2 rounded-lg shadow"
                                 required
@@ -248,7 +248,7 @@ const LibraryBrowser: React.FC = () => {
                                 }}
                                 showTimeSelect
                                 timeIntervals={5}
-                                dateFormat="MMMM d, yyyy h:mm aa"
+                                dateFormat="MMMM d, h:mm aa"
                                 wrapperClassName="w-full"
                                 className="block w-full space-y-2 p-2 rounded-lg shadow"
                                 required
