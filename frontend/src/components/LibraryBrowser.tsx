@@ -27,6 +27,8 @@ import { useLibrary } from "../contexts/LibraryContext";
 import { useAuth } from "../contexts/AuthProvider";
 import RecentReservations from "../components/RecentReservations";
 import { Link, Navigate } from "react-router-dom";
+import DatePicker from "react-datepicker";
+import { addDays } from "@/api/libraryService";
 
 const LoadingSpinner = () => (
     <div className="flex justify-center items-center">
@@ -43,11 +45,15 @@ const LibraryBrowser: React.FC = () => {
         selectedFloor,
         rooms,
         loading,
+        selectedStartTime,
+        selectedEndTime,
         error,
         selectLibrary,
         selectFloor,
         selectRoom,
         refreshLibraries,
+        setStartTime,
+        setEndTime,
     } = useLibrary();
 
     const auth = useAuth();
@@ -127,9 +133,9 @@ const LibraryBrowser: React.FC = () => {
                                     <h3 className="font-medium">
                                         {library.name}
                                     </h3>
-                                    <p className="text-sm text-gray-600">
+                                    {/* <p className="text-sm text-gray-600">
                                         {library.location}
-                                    </p>
+                                    </p> */}
                                     <p className="text-xs text-gray-500">
                                         Hours:{" "}
                                         {formatTime(library.opening_time)} -{" "}
@@ -188,6 +194,74 @@ const LibraryBrowser: React.FC = () => {
                             ))}
                         </ul>
                     )}
+                </div>
+
+                {/* Time Picker Column */}
+                <div className="bg-white p-6 rounded-lg shadow">
+                    <h2 className="text-xl font-semibold mb-6 text-gray-800">
+                        Reservation Time
+                    </h2>
+
+                    {!selectedLibrary ? (
+                        <p className="text-gray-500 text-center py-2">
+                            Please select a library first
+                        </p>
+                    ) : (
+                        <div className="flex gap-2">
+                            <DatePicker
+                                selected={selectedStartTime}
+                                onChange={(date) => {
+                                    setStartTime(date);
+                                    if (
+                                        (date &&
+                                            selectedEndTime &&
+                                            date > selectedEndTime) ||
+                                        !selectedEndTime
+                                    ) {
+                                        setEndTime(date);
+                                    }
+                                }}
+                                showTimeSelect
+                                timeIntervals={5}
+                                dateFormat="MMMM d, yyyy h:mm aa"
+                                wrapperClassName="w-full"
+                                className="block w-full space-y-2 p-2 rounded-lg shadow"
+                                required
+                                includeDateIntervals={[
+                                    {
+                                        start: addDays(new Date(), -1),
+                                        end: addDays(new Date(), 7),
+                                    },
+                                ]}
+                                placeholderText="Start Time"
+                            />
+                            <DatePicker
+                                selected={selectedEndTime}
+                                onChange={(date) => {
+                                    setEndTime(date);
+                                    if (
+                                        selectedStartTime &&
+                                        date &&
+                                        selectedStartTime > date
+                                    )
+                                        setStartTime(date);
+                                }}
+                                showTimeSelect
+                                timeIntervals={5}
+                                dateFormat="MMMM d, yyyy h:mm aa"
+                                wrapperClassName="w-full"
+                                className="block w-full space-y-2 p-2 rounded-lg shadow"
+                                required
+                                includeDateIntervals={[
+                                    {
+                                        start: addDays(new Date(), -1),
+                                        end: addDays(new Date(), 7),
+                                    },
+                                ]}
+                                placeholderText="End Time"
+                            />
+                        </div>
+                    )}
 
                     {floors.length === 0 &&
                         selectedLibrary &&
@@ -199,7 +273,7 @@ const LibraryBrowser: React.FC = () => {
                 </div>
 
                 {/* Rooms Column */}
-                <div className="bg-white p-6 rounded-lg shadow">
+                <div className="bg-white p-6 col-span-3 rounded-lg shadow">
                     <h2 className="text-xl font-semibold mb-4 text-gray-800">
                         {selectedFloor
                             ? `Rooms - Floor ${selectedFloor.number}`
@@ -234,7 +308,7 @@ const LibraryBrowser: React.FC = () => {
                                             <p className="text-sm text-gray-600">
                                                 Capacity: {room.capacity}
                                             </p>
-                                            <div className="flex flex-wrap gap-1 text-xs mt-1">
+                                            <div className="flex space-x-2 text-xs mt-1">
                                                 {room.has_whiteboard && (
                                                     <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
                                                         Whiteboard
@@ -299,39 +373,35 @@ const LibraryBrowser: React.FC = () => {
                         </p>
                     )}
                 </div>
-
-                {/* Materials Column */}
-                {selectedLibrary && (
-                    <div className="mt-6">
-                        <h2 className="text-xl font-semibold text-gray-800">
-                            Available Materials at {selectedLibrary.name}
-                        </h2>
-                        {loading.materials ? (
-                            <LoadingSpinner />
-                        ) : materials.length > 0 ? (
-                            <ul className="list-disc ml-6 mt-2">
-                                {materials.map((material) => (
-                                    <li
-                                        key={material.id}
-                                        className="text-gray-700"
-                                    >
-                                        {material.name
-                                            .replace("_", " ")
-                                            .toUpperCase()}{" "}
-                                        {/* Format names */}
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p className="text-gray-600 italic">
-                                No materials available.
-                            </p>
-                        )}
-                    </div>
-                )}
             </div>
             {/* After main grid */}
             {/* ADDED: Recent reservations section */}
+            {/* Materials Column */}
+            {selectedLibrary && (
+                <div className="mt-6">
+                    <h2 className="text-xl font-semibold text-gray-800">
+                        Available Materials at {selectedLibrary.name}
+                    </h2>
+                    {loading.materials ? (
+                        <LoadingSpinner />
+                    ) : materials.length > 0 ? (
+                        <ul className="list-disc ml-6 mt-2">
+                            {materials.map((material) => (
+                                <li key={material.id} className="text-gray-700">
+                                    {material.name
+                                        .replace("_", " ")
+                                        .toUpperCase()}{" "}
+                                    {/* Format names */}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="text-gray-600 italic">
+                            No materials available.
+                        </p>
+                    )}
+                </div>
+            )}
             {isAuthenticated && (
                 <div className="mt-8">
                     <div className="bg-white p-6 rounded-lg shadow">

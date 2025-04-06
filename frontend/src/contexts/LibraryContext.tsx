@@ -38,6 +38,7 @@ import {
     Floor,
     Room,
     Material,
+    getFilteredRooms,
 } from "../api/libraryService";
 
 import api from "../api/axiosInstance";
@@ -57,10 +58,14 @@ interface LibraryContextType {
         rooms: boolean;
         materials: boolean;
     };
+    selectedStartTime: Date | null;
+    selectedEndTime: Date | null;
     error: string | null;
     selectLibrary: (library: Library | null) => void;
     selectFloor: (floor: Floor | null) => void;
     selectRoom: (room: Room | null) => void;
+    setStartTime: (start: Date | null) => void;
+    setEndTime: (end: Date | null) => void;
     refreshLibraries: () => Promise<void>;
 
     /**
@@ -84,6 +89,8 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({
     );
     const [floors, setFloors] = useState<Floor[]>([]);
     const [selectedFloor, setSelectedFloor] = useState<Floor | null>(null);
+    const [selectedStartTime, setStartTime] = useState<Date | null>(null);
+    const [selectedEndTime, setEndTime] = useState<Date | null>(null);
     const [rooms, setRooms] = useState<Room[]>([]);
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
     const [materials, setMaterials] = useState<Material[]>([]);
@@ -124,6 +131,16 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({
             setSelectedRoom(null);
         }
     }, [selectedFloor]);
+
+    useEffect(() => {
+        if (selectedStartTime && selectedEndTime) {
+            fetchFilteredRooms(
+                selectedFloor?.id,
+                selectedStartTime,
+                selectedEndTime
+            );
+        }
+    }, [selectedStartTime, selectedEndTime]);
 
     const refreshLibraries = async () => {
         setLoading((prev) => ({ ...prev, libraries: true }));
@@ -227,6 +244,43 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({
             }
 
             setRooms(filteredRooms);
+        } catch (err: any) {
+            console.error(`Error fetching rooms for floor ${floorId}:`, err);
+
+            // Check if error is related to authentication
+            if (
+                err?.response?.status === 401 ||
+                err?.response?.data?.code === "token_not_valid"
+            ) {
+                setError("Authentication error. Please log in again.");
+            } else {
+                setError(
+                    `Failed to load rooms for floor ${floorId}. Please try again later.`
+                );
+            }
+        } finally {
+            setLoading((prev) => ({ ...prev, rooms: false }));
+        }
+    };
+
+    const fetchFilteredRooms = async (
+        floorId: number | null | undefined,
+        start: Date,
+        end: Date
+    ) => {
+        // Clear existing rooms and selection
+        setRooms([]);
+        setSelectedRoom(null);
+
+        setLoading((prev) => ({ ...prev, rooms: true }));
+        setError(null);
+
+        try {
+            // console.log(`Fetching rooms for floor ${floorId}...`);
+            const data = await getFilteredRooms(floorId, start, end);
+            // console.log(`Rooms fetched for floor ${floorId}:`, data);
+
+            setRooms(data);
         } catch (err: any) {
             console.error(`Error fetching rooms for floor ${floorId}:`, err);
 
@@ -374,10 +428,14 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({
                 selectedRoom,
                 materials,
                 loading,
+                selectedStartTime,
+                selectedEndTime,
                 error,
                 selectLibrary,
                 selectFloor,
                 selectRoom,
+                setStartTime,
+                setEndTime,
                 refreshLibraries,
                 getRoomById,
             }}
