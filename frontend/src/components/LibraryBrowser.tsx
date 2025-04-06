@@ -82,19 +82,19 @@ const LibraryBrowser: React.FC = () => {
                 <div className="flex gap-4">
                     <Link
                         to="/my-reservations"
-                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+                        className="bg-green-500 shadow hover:bg-green-600 text-white px-4 py-2 rounded"
                     >
                         My Reservations
                     </Link>
                     <button
                         onClick={() => refreshLibraries()}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                        className="bg-blue-500 shadow hover:bg-blue-600 text-white px-4 py-2 rounded"
                     >
                         Refresh
                     </button>
                     <Link
                         to="/logout"
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+                        className="bg-gray-500 shadow hover:bg-gray-600 text-white px-4 py-2 rounded"
                     >
                         Logout
                     </Link>
@@ -310,27 +310,27 @@ const LibraryBrowser: React.FC = () => {
                                             </p>
                                             <div className="flex space-x-2 text-xs mt-1">
                                                 {room.has_whiteboard && (
-                                                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                                    <span className="bg-blue-100 shadow text-blue-800 px-2 py-1 rounded">
                                                         Whiteboard
                                                     </span>
                                                 )}
                                                 {room.has_monitor && (
-                                                    <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded">
+                                                    <span className="bg-purple-100 shadow text-purple-800 px-2 py-1 rounded">
                                                         Monitor
                                                     </span>
                                                 )}
                                                 {room.has_window && (
-                                                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                                                    <span className="bg-yellow-100 shadow text-yellow-800 px-2 py-1 rounded">
                                                         Window
                                                     </span>
                                                 )}
                                                 {room.is_graduate_only && (
-                                                    <span className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded">
+                                                    <span className="bg-indigo-100 shadow text-indigo-800 px-2 py-1 rounded">
                                                         Grad Only
                                                     </span>
                                                 )}
                                                 {room.requires_admin_approval && (
-                                                    <span className="bg-amber-100 text-amber-800 px-2 py-1 rounded">
+                                                    <span className="bg-amber-100 shadow text-amber-800 px-2 py-1 rounded">
                                                         Approval Req.
                                                     </span>
                                                 )}
@@ -338,7 +338,7 @@ const LibraryBrowser: React.FC = () => {
                                         </div>
                                         <div className="text-right">
                                             <span
-                                                className={`text-xs font-medium px-2 py-1 rounded-full
+                                                className={`text-xs font-medium px-2 py-1 shadow rounded-full
                                     ${
                                         room.status === "available"
                                             ? "bg-green-100 text-green-800"
@@ -354,7 +354,7 @@ const LibraryBrowser: React.FC = () => {
                                                 <div className="mt-2">
                                                     <Link
                                                         to={`/reserve/${room.room_id}`}
-                                                        className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded-md block text-center transition-colors duration-200"
+                                                        className="bg-blue-500 shadow hover:bg-blue-600 text-white text-sm px-3 py-1 rounded-md block text-center transition-colors duration-200"
                                                     >
                                                         Reserve
                                                     </Link>
