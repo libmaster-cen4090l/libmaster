@@ -186,7 +186,7 @@ const LibraryBrowser: React.FC = () => {
                                         Floor {floor.number}
                                     </h3>
                                     {floor.description && (
-                                        <p className="text-sm text-gray-600">
+                                        <p className="text-xs text-gray-500">
                                             {floor.description}
                                         </p>
                                     )}
