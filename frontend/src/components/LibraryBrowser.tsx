@@ -27,6 +27,8 @@ import { useLibrary } from "../contexts/LibraryContext";
 import { useAuth } from "../contexts/AuthProvider";
 import RecentReservations from "../components/RecentReservations";
 import { Link, Navigate } from "react-router-dom";
+import DatePicker from "react-datepicker";
+import { addDays } from "@/api/libraryService";
 
 const LoadingSpinner = () => (
     <div className="flex justify-center items-center">
@@ -43,11 +45,15 @@ const LibraryBrowser: React.FC = () => {
         selectedFloor,
         rooms,
         loading,
+        selectedStartTime,
+        selectedEndTime,
         error,
         selectLibrary,
         selectFloor,
         selectRoom,
         refreshLibraries,
+        setStartTime,
+        setEndTime,
     } = useLibrary();
 
     const auth = useAuth();
@@ -73,22 +79,22 @@ const LibraryBrowser: React.FC = () => {
                 <h1 className="text-3xl font-bold text-gray-900">
                     Library Study Rooms
                 </h1>
-                <div className="flex gap-4">
+                <div className="flex max-h-10 gap-3">
                     <Link
                         to="/my-reservations"
-                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+                        className="bg-emerald-400 text-center shadow hover:bg-emerald-500 text-white px-4 max-h-10 min-w-40 transition-colors py-2 rounded-lg"
                     >
                         My Reservations
                     </Link>
                     <button
                         onClick={() => refreshLibraries()}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                        className="bg-blue-400 shadow hover:bg-blue-500 text-white px-4 transition-colors py-2 rounded-lg"
                     >
                         Refresh
                     </button>
                     <Link
                         to="/logout"
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+                        className="bg-gray-400 shadow hover:bg-slate-500 text-white px-4 transition-colors py-2 rounded-lg"
                     >
                         Logout
                     </Link>
@@ -116,7 +122,7 @@ const LibraryBrowser: React.FC = () => {
                             {libraries.map((library) => (
                                 <li
                                     key={library.id}
-                                    className={`p-3 rounded-md cursor-pointer transition-colors duration-200
+                                    className={`p-3 h-16 rounded-md cursor-pointer transition-colors duration-200
                                         ${
                                             selectedLibrary?.id === library.id
                                                 ? "bg-blue-100 border-l-4 border-blue-500"
@@ -127,9 +133,9 @@ const LibraryBrowser: React.FC = () => {
                                     <h3 className="font-medium">
                                         {library.name}
                                     </h3>
-                                    <p className="text-sm text-gray-600">
+                                    {/* <p className="text-sm text-gray-600">
                                         {library.location}
-                                    </p>
+                                    </p> */}
                                     <p className="text-xs text-gray-500">
                                         Hours:{" "}
                                         {formatTime(library.opening_time)} -{" "}
@@ -168,7 +174,7 @@ const LibraryBrowser: React.FC = () => {
                             {floors.map((floor) => (
                                 <li
                                     key={floor.id}
-                                    className={`p-3 rounded-md cursor-pointer transition-colors duration-200 
+                                    className={`p-3 rounded-md h- cursor-pointer transition-colors duration-200 
                                         ${
                                             selectedFloor?.id === floor.id
                                                 ? "bg-blue-100 border-l-4 border-blue-500"
@@ -180,13 +186,81 @@ const LibraryBrowser: React.FC = () => {
                                         Floor {floor.number}
                                     </h3>
                                     {floor.description && (
-                                        <p className="text-sm text-gray-600">
+                                        <p className="text-xs text-gray-500">
                                             {floor.description}
                                         </p>
                                     )}
                                 </li>
                             ))}
                         </ul>
+                    )}
+                </div>
+
+                {/* Time Picker Column */}
+                <div className="bg-white p-6 rounded-lg shadow">
+                    <h2 className="text-xl font-semibold mb-4 text-gray-800">
+                        Reservation Time
+                    </h2>
+
+                    {!selectedLibrary ? (
+                        <p className="text-gray-500 text-center py-2">
+                            Please select a library first
+                        </p>
+                    ) : (
+                        <div className="flex w-full">
+                            <DatePicker
+                                selected={selectedStartTime}
+                                onChange={(date) => {
+                                    setStartTime(date);
+                                    if (
+                                        (date &&
+                                            selectedEndTime &&
+                                            date > selectedEndTime) ||
+                                        !selectedEndTime
+                                    ) {
+                                        setEndTime(date);
+                                    }
+                                }}
+                                showTimeSelect
+                                timeIntervals={5}
+                                dateFormat="MMMM d, h:mm aa"
+                                wrapperClassName=""
+                                className="text-center w-full border-blue-300 select-none border-4 border-r-0 flex p-2 rounded-r-none rounded-lg"
+                                required
+                                includeDateIntervals={[
+                                    {
+                                        start: addDays(new Date(), -1),
+                                        end: addDays(new Date(), 7),
+                                    },
+                                ]}
+                                placeholderText="Start Time"
+                            />
+                            <DatePicker
+                                selected={selectedEndTime}
+                                onChange={(date) => {
+                                    setEndTime(date);
+                                    if (
+                                        selectedStartTime &&
+                                        date &&
+                                        selectedStartTime > date
+                                    )
+                                        setStartTime(date);
+                                }}
+                                showTimeSelect
+                                timeIntervals={5}
+                                dateFormat="MMMM d, h:mm aa"
+                                wrapperClassName=""
+                                className="block border-blue-300 w-full border-4 select-none text-center rounded-l-none p-2 rounded-lg"
+                                required
+                                includeDateIntervals={[
+                                    {
+                                        start: addDays(new Date(), -1),
+                                        end: addDays(new Date(), 7),
+                                    },
+                                ]}
+                                placeholderText="End Time"
+                            />
+                        </div>
                     )}
 
                     {floors.length === 0 &&
@@ -199,7 +273,7 @@ const LibraryBrowser: React.FC = () => {
                 </div>
 
                 {/* Rooms Column */}
-                <div className="bg-white p-6 rounded-lg shadow">
+                <div className="bg-white p-6 col-span-3 rounded-lg shadow">
                     <h2 className="text-xl font-semibold mb-4 text-gray-800">
                         {selectedFloor
                             ? `Rooms - Floor ${selectedFloor.number}`
@@ -234,29 +308,29 @@ const LibraryBrowser: React.FC = () => {
                                             <p className="text-sm text-gray-600">
                                                 Capacity: {room.capacity}
                                             </p>
-                                            <div className="flex flex-wrap gap-1 text-xs mt-1">
+                                            <div className="flex space-x-2 text-xs mt-1">
                                                 {room.has_whiteboard && (
-                                                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                                    <span className="bg-blue-100 shadow text-blue-800 px-2 py-1 rounded">
                                                         Whiteboard
                                                     </span>
                                                 )}
                                                 {room.has_monitor && (
-                                                    <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded">
+                                                    <span className="bg-purple-100 shadow text-purple-800 px-2 py-1 rounded">
                                                         Monitor
                                                     </span>
                                                 )}
                                                 {room.has_window && (
-                                                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                                                    <span className="bg-yellow-100 shadow text-yellow-800 px-2 py-1 rounded">
                                                         Window
                                                     </span>
                                                 )}
                                                 {room.is_graduate_only && (
-                                                    <span className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded">
+                                                    <span className="bg-indigo-100 shadow text-indigo-800 px-2 py-1 rounded">
                                                         Grad Only
                                                     </span>
                                                 )}
                                                 {room.requires_admin_approval && (
-                                                    <span className="bg-amber-100 text-amber-800 px-2 py-1 rounded">
+                                                    <span className="bg-amber-100 shadow text-amber-800 px-2 py-1 rounded">
                                                         Approval Req.
                                                     </span>
                                                 )}
@@ -264,7 +338,7 @@ const LibraryBrowser: React.FC = () => {
                                         </div>
                                         <div className="text-right">
                                             <span
-                                                className={`text-xs font-medium px-2 py-1 rounded-full
+                                                className={`text-xs font-medium px-2 py-1 shadow rounded-full
                                     ${
                                         room.status === "available"
                                             ? "bg-green-100 text-green-800"
@@ -280,7 +354,7 @@ const LibraryBrowser: React.FC = () => {
                                                 <div className="mt-2">
                                                     <Link
                                                         to={`/reserve/${room.room_id}`}
-                                                        className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded-md block text-center transition-colors duration-200"
+                                                        className="bg-blue-500 shadow hover:bg-blue-600 text-white text-sm px-3 py-1 rounded-md block text-center transition-colors duration-200"
                                                     >
                                                         Reserve
                                                     </Link>
@@ -299,39 +373,35 @@ const LibraryBrowser: React.FC = () => {
                         </p>
                     )}
                 </div>
-
-                {/* Materials Column */}
-                {selectedLibrary && (
-                    <div className="mt-6">
-                        <h2 className="text-xl font-semibold text-gray-800">
-                            Available Materials at {selectedLibrary.name}
-                        </h2>
-                        {loading.materials ? (
-                            <LoadingSpinner />
-                        ) : materials.length > 0 ? (
-                            <ul className="list-disc ml-6 mt-2">
-                                {materials.map((material) => (
-                                    <li
-                                        key={material.id}
-                                        className="text-gray-700"
-                                    >
-                                        {material.name
-                                            .replace("_", " ")
-                                            .toUpperCase()}{" "}
-                                        {/* Format names */}
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p className="text-gray-600 italic">
-                                No materials available.
-                            </p>
-                        )}
-                    </div>
-                )}
             </div>
             {/* After main grid */}
             {/* ADDED: Recent reservations section */}
+            {/* Materials Column */}
+            {selectedLibrary && (
+                <div className="mt-6">
+                    <h2 className="text-xl font-semibold text-gray-800">
+                        Available Materials at {selectedLibrary.name}
+                    </h2>
+                    {loading.materials ? (
+                        <LoadingSpinner />
+                    ) : materials.length > 0 ? (
+                        <ul className="list-disc ml-6 mt-2">
+                            {materials.map((material) => (
+                                <li key={material.id} className="text-gray-700">
+                                    {material.name
+                                        .replace("_", " ")
+                                        .toUpperCase()}{" "}
+                                    {/* Format names */}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="text-gray-600 italic">
+                            No materials available.
+                        </p>
+                    )}
+                </div>
+            )}
             {isAuthenticated && (
                 <div className="mt-8">
                     <div className="bg-white p-6 rounded-lg shadow">

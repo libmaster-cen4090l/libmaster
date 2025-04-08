@@ -53,8 +53,9 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
      * @param {ChangeEvent} e - Form input change change event
      */
     const handleChange = (
-          e: React.ChangeEvent< 
-              HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement >
+        e: React.ChangeEvent<
+            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >
     ) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -67,23 +68,22 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
      * Handles date changes for react-datepicker
      *
      */
-     const handleDateChange = ( date: Date | null, field: 'start_time' | 'end_time' ) =>
-     {
-       setFormData( prev => (
-       {
-         ...prev,
-         [field]: date
-       }));
-     };
+    const handleDateChange = (
+        date: Date | null,
+        field: "start_time" | "end_time"
+    ) => {
+        setFormData((prev) => ({
+            ...prev,
+            [field]: date,
+        }));
+    };
 
     /**
      * Format dates for API submission
      */
-    const formatDateForAPI = ( date: Date | null ): string =>
-    {
-      if ( !date )
-        return '';
-      return date.toISOString();
+    const formatDateForAPI = (date: Date | null): string => {
+        if (!date) return "";
+        return date.toISOString();
     };
 
     /**
@@ -103,8 +103,8 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
             // call API to create the reservation
             const reservation = await createReservation({
                 room_id: room.room_id,
-                start_time: formatDateForAPI( formData.start_time ),
-                end_time: formatDateForAPI( formData.end_time ),
+                start_time: formatDateForAPI(formData.start_time),
+                end_time: formatDateForAPI(formData.end_time),
                 purpose: formData.purpose,
                 num_attendees: formData.num_attendees,
                 notes: formData.notes,
@@ -117,7 +117,9 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
         } catch (err: any) {
             //show detailed error messages
             if (err.response && err.response.data) {
-                const messages = Object.values(err.response.data).flat().join('\n');
+                const messages = Object.values(err.response.data)
+                    .flat()
+                    .join("\n");
                 setError(`Unable to create reservation:\n${messages}`);
             } else {
                 setError("Error creating reservation");
@@ -140,7 +142,9 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
                     <div className="flex">
                         <div className="ml-3">
                             <p className="text-sm text-amber-700">
-                                This room requires administrator approval. Your reservation will be pending until approved by library staff.
+                                This room requires administrator approval. Your
+                                reservation will be pending until approved by
+                                library staff.
                             </p>
                         </div>
                     </div>
@@ -151,7 +155,8 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
                     <div className="flex">
                         <div className="ml-3">
                             <p className="text-sm text-indigo-700">
-                                This room is reserved for graduate students only.
+                                This room is reserved for graduate students
+                                only.
                             </p>
                         </div>
                     </div>
@@ -159,7 +164,7 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
             )}
             {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                     <pre className="whitespace-pre-wrap">{error}</pre>
+                    <pre className="whitespace-pre-wrap">{error}</pre>
                 </div>
             )}
 
@@ -175,7 +180,9 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
                             </label>
                             <DatePicker
                                 selected={formData.start_time}
-                                onChange={(date) => handleDateChange( date, 'start_time' )}
+                                onChange={(date) =>
+                                    handleDateChange(date, "start_time")
+                                }
                                 showTimeSelect
                                 timeIntervals={5}
                                 dateFormat="MMMM d, yyyy h:mm aa"
@@ -190,7 +197,9 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
                             </label>
                             <DatePicker
                                 selected={formData.end_time}
-                                onChange={(date) => handleDateChange( date, 'end_time' )}
+                                onChange={(date) =>
+                                    handleDateChange(date, "end_time")
+                                }
                                 showTimeSelect
                                 timeIntervals={5}
                                 dateFormat="MMMM d, yyyy h:mm aa"

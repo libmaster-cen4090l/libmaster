@@ -2,8 +2,9 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
-from datetime import datetime
+from django.utils import timezone, dateparse
+from datetime import datetime, timedelta
+from django.db.models import Q
 from .models import Library, Floor, Room, Reservation, Material
 from .serializers import LibrarySerializer, FloorSerializer, RoomSerializer, ReservationSerializer, RoomAvailabilitySerializer, MaterialSerializer
 from django.http import JsonResponse
@@ -61,6 +62,21 @@ class RoomViewSet(viewsets.ReadOnlyModelViewSet):
         status = self.request.query_params.get('status', None)
         if status is not None:
             queryset = queryset.filter(status=status)
+
+        start_time_str = self.request.query_params.get('start_time', None)
+        end_time_str = self.request.query_params.get('end_time', None)
+        if start_time_str is not None and end_time_str is not None:
+            start_time = dateparse.parse_datetime(start_time_str)
+            end_time = dateparse.parse_datetime(end_time_str)
+
+            if not start_time or not end_time:
+                raise ValueError("Invalid date format for start-time or end-time.")
+            if start_time >= end_time:
+                raise ValueError("Start time must be before end time.")
+
+            queryset = queryset.exclude(
+                Q(reservations__start_time__lt=end_time) & Q(reservations__end_time__gt=start_time)
+            )
 
         if not user.groups.filter(name='Graduate Students').exists():
             queryset = queryset.filter(is_graduate_only=False)

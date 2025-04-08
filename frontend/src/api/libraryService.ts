@@ -155,6 +155,44 @@ export const getFloorRooms = async (floorId: number): Promise<Room[]> => {
     }
 };
 
+export const getFilteredRooms = async (
+    floorId: number | null | undefined,
+    start_time: Date,
+    end_time: Date
+): Promise<Room[]> => {
+    try {
+        const params: Record<string, any> = {
+            start_time: start_time.toISOString(),
+            end_time: end_time.toISOString(),
+        };
+        if (floorId) params.floor = floorId;
+
+        const response = await api.get<PaginatedResponse<Room> | Room[]>(
+            `rooms/rooms`,
+            {
+                params: params,
+            }
+        );
+        // Handle paginated response
+        if (response.data && "results" in response.data) {
+            return response.data.results;
+        }
+
+        // Handle array response
+        if (Array.isArray(response.data)) {
+            return response.data;
+        }
+
+        return [];
+    } catch (e) {
+        logError(
+            `Error fetching rooms for floor ${floorId}, start_time ${start_time}, end_time ${end_time}`,
+            e
+        );
+        return [];
+    }
+};
+
 // Get room availability for a specific date/time
 export const getRoomAvailability = async (
     roomId: string,
@@ -286,3 +324,9 @@ export const getLibraryMaterials = async (
         return [];
     }
 };
+
+export function addDays(date: Date, days: number) {
+    let result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+}
