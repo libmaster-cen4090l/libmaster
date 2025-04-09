@@ -25,7 +25,7 @@
 import React, { useEffect } from "react";
 import { useLibrary } from "../contexts/LibraryContext";
 import { useAuth } from "../contexts/AuthProvider";
-import RecentReservations from "../components/RecentReservations";
+import RecentReservations from "../components/reservations/RecentReservations";
 import { Link, Navigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import { addDays } from "@/api/libraryService";

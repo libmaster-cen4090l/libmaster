@@ -21,8 +21,8 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
-import { createReservation, Room } from "../api/libraryService";
-import { useAuth } from "../contexts/AuthProvider";
+import { createReservation, Room } from "../../api/libraryService";
+import { useAuth } from "../../contexts/AuthProvider";
 import "react-datepicker/dist/react-datepicker.css";
 
 interface ReservationFormProps {
