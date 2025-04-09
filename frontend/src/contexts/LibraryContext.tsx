@@ -140,7 +140,7 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({
                 selectedEndTime
             );
         }
-    }, [selectedStartTime, selectedEndTime]);
+    }, [selectedStartTime, selectedEndTime, selectedFloor?.id]);
 
     const refreshLibraries = async () => {
         setLoading((prev) => ({ ...prev, libraries: true }));
@@ -275,6 +275,13 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({
         setLoading((prev) => ({ ...prev, rooms: true }));
         setError(null);
 
+        // validate time range
+        if (start >= end) {
+          setError("End time must be after start time");
+          setLoading((prev) => ({ ...prev, rooms: false }));
+          return;
+        }
+
         try {
             // console.log(`Fetching rooms for floor ${floorId}...`);
             const data = await getFilteredRooms(floorId, start, end);
@@ -284,13 +291,17 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({
         } catch (err: any) {
             console.error(`Error fetching rooms for floor ${floorId}:`, err);
 
+            if (err.message === "End time must be after start time") {
+                setError("Please select an end time that is after the start time");
+            }
             // Check if error is related to authentication
-            if (
+            else if (
                 err?.response?.status === 401 ||
                 err?.response?.data?.code === "token_not_valid"
             ) {
                 setError("Authentication error. Please log in again.");
-            } else {
+            } 
+            else {
                 setError(
                     `Failed to load rooms for floor ${floorId}. Please try again later.`
                 );

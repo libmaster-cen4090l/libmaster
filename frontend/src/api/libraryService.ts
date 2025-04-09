@@ -160,6 +160,11 @@ export const getFilteredRooms = async (
     start_time: Date,
     end_time: Date
 ): Promise<Room[]> => {
+
+    if (start_time >= end_time) {
+      throw new Error("End time must be after start time");
+    }
+
     try {
         const params: Record<string, any> = {
             start_time: start_time.toISOString(),
@@ -168,13 +173,14 @@ export const getFilteredRooms = async (
         if (floorId) params.floor = floorId;
 
         const response = await api.get<PaginatedResponse<Room> | Room[]>(
-            `rooms/rooms`,
-            {
-                params: params,
+            `rooms/rooms/`,
+            { 
+              params: params,
             }
         );
+
         // Handle paginated response
-        if (response.data && "results" in response.data) {
+        if (response.data && typeof response.data === 'object' && "results" in response.data) {
             return response.data.results;
         }
 
@@ -184,12 +190,14 @@ export const getFilteredRooms = async (
         }
 
         return [];
-    } catch (e) {
-        logError(
-            `Error fetching rooms for floor ${floorId}, start_time ${start_time}, end_time ${end_time}`,
-            e
-        );
-        return [];
+    } catch (e: any) {
+        if (e?.response?.data && typeof e.response.data === 'object' && 
+        'detail' in e.response.data && 
+        e.response.data.detail.includes("Start time must be before end time")) {
+            throw new Error("End time must be after start time");
+      }
+
+      throw e;
     }
 };
 

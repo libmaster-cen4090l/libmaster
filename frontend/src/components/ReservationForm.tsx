@@ -27,16 +27,23 @@ import "react-datepicker/dist/react-datepicker.css";
 
 interface ReservationFormProps {
     room: Room;
+    initialStartTime?: Date | null;
+    initialEndTime?: Date | null;
 }
 
-const ReservationForm: React.FC<ReservationFormProps> = ({ room }) => {
+const ReservationForm: React.FC<ReservationFormProps> = ({ 
+    room,
+    initialStartTime,
+    initialEndTime
+}) => {
+
     const navigate = useNavigate();
 
     // state for form data, loading status, and error messages
     // -- Modified state to use Date objects instead of strings
     const [formData, setFormData] = useState({
-        start_time: null as Date | null,
-        end_time: null as Date | null,
+        start_time: initialStartTime || null as Date | null,
+        end_time: initialEndTime || null as Date | null,
         purpose: "",
         num_attendees: 1,
         notes: "",

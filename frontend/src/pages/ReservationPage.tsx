@@ -41,7 +41,7 @@ const ReservationPage: React.FC = () => {
 
     // authentication and library context hooks
     const auth = useAuth();
-    const { getRoomById, error: contextError } = useLibrary();
+    const { getRoomById, selectedStartTime, selectedEndTime, error: contextError } = useLibrary();
 
     // redirect to login if not authenticated
     if (auth.token === null) {
@@ -166,7 +166,11 @@ const ReservationPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-gray-100 p-8">
             <div className="max-w-2xl mx-auto">
-                <ReservationForm room={room} />
+                <ReservationForm
+                    room={room} 
+                    initialStartTime={selectedStartTime}
+                    initialEndTime={selectedEndTime}
+                />
             </div>
         </div>
     );
