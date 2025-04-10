@@ -6,13 +6,7 @@
  * browse available rooms.
  *
  * Author(s): Zack Lima, Ivan Lepesii, Colby Leavitt, Dylan Connolly
- * Modified: 3/3/2025 @ 2:48:02 EST by Dylan
- *
- * MODIFICATIONS:
- * - Added navigation link to My Reservations page
- * - Incorporated the RecentReservations component for viewing recent bookings
- * - Enhanced header with improved navigation options
- * - Added conditional rendering based on authentication status
+ * Modified: 4/9/2025 @ 20:38:47 EST by Dylan
  *
  * @component
  * @requires React
@@ -20,6 +14,12 @@
  * @requires ../../contexts/LibraryContext
  * @requires ../../contexts/AuthProvider
  * @requires ../reservations/RecentReservations
+ * @requires react-datepicker
+ * @requires ../common/LoadingSpinner
+ * @requires ../common/StatusBadge
+ * @requires ../common/AmenityTag
+ * @requires ../common/ErrorDisplay
+ * @requires ./LibrarySelectionPanel
  */
 
 import React, { useEffect } from "react";
@@ -33,6 +33,7 @@ import LoadingSpinner from '../common/LoadingSpinner';
 import StatusBadge from '../common/StatusBadge';
 import AmenityTag from '../common/AmenityTag';
 import ErrorDisplay from '../common/ErrorDisplay';
+import LibrarySelectionPanel from './LibrarySelectionPanel';
 
 const LibraryBrowser: React.FC = () => {
     const {
@@ -104,49 +105,13 @@ const LibraryBrowser: React.FC = () => {
             {/* MAIN GRID for libraries, floors, rooms, materials */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Libraries Column */}
-                <div className="bg-white p-6 rounded-lg shadow">
-                    <h2 className="text-xl font-semibold mb-4 text-gray-800">
-                        Libraries
-                    </h2>
-
-                    {loading.libraries ? (
-                        <LoadingSpinner />
-                    ) : (
-                        <ul className="space-y-2">
-                            {libraries.map((library) => (
-                                <li
-                                    key={library.id}
-                                    className={`p-3 h-16 rounded-md cursor-pointer transition-colors duration-200
-                                        ${
-                                            selectedLibrary?.id === library.id
-                                                ? "bg-blue-100 border-l-4 border-blue-500"
-                                                : "hover:bg-gray-100"
-                                        }`}
-                                    onClick={() => selectLibrary(library)}
-                                >
-                                    <h3 className="font-medium">
-                                        {library.name}
-                                    </h3>
-                                    {/* <p className="text-sm text-gray-600">
-                                        {library.location}
-                                    </p> */}
-                                    <p className="text-xs text-gray-500">
-                                        Hours:{" "}
-                                        {formatTime(library.opening_time)} -{" "}
-                                        {formatTime(library.closing_time)}
-                                    </p>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-
-                    {libraries.length === 0 && !loading.libraries && (
-                        <p className="text-gray-500 text-center py-4">
-                            No libraries available.
-                        </p>
-                    )}
-                </div>
-
+                <LibrarySelectionPanel
+                    libraries={libraries}
+                    selectedLibrary={selectedLibrary}
+                    loading={loading.libraries}
+                    onSelectLibrary={selectLibrary}
+                />
+                {/* End Libraries Column */}
                 {/* Floors Column */}
                 <div className="bg-white p-6 rounded-lg shadow">
                     <h2 className="text-xl font-semibold mb-4 text-gray-800">
@@ -189,7 +154,7 @@ const LibraryBrowser: React.FC = () => {
                         </ul>
                     )}
                 </div>
-
+                {/* End Floors Column */}
                 {/* Time Picker Column */}
                 <div className="bg-white p-6 rounded-lg shadow">
                     <h2 className="text-xl font-semibold mb-4 text-gray-800">
