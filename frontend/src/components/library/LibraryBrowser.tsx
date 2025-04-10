@@ -20,20 +20,27 @@
  * @requires ../common/AmenityTag
  * @requires ../common/ErrorDisplay
  * @requires ./LibrarySelectionPanel
+ * @requires ./FloorSelectionPanel
  */
 
+// react dependencies
 import React, { useEffect } from "react";
-import { useLibrary } from "../../contexts/LibraryContext";
-import { useAuth } from "../../contexts/AuthProvider";
-import RecentReservations from "../reservations/RecentReservations";
 import { Link, Navigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
+
+// contexts and APIs
+import { useLibrary } from "../../contexts/LibraryContext";
+import { useAuth } from "../../contexts/AuthProvider";
 import { addDays } from "@/api/libraryService";
+
+// user-defined component dependencies
+import RecentReservations from "../reservations/RecentReservations";
 import LoadingSpinner from '../common/LoadingSpinner';
 import StatusBadge from '../common/StatusBadge';
 import AmenityTag from '../common/AmenityTag';
 import ErrorDisplay from '../common/ErrorDisplay';
 import LibrarySelectionPanel from './LibrarySelectionPanel';
+import FloorSelectionPanel from './FloorSelectionPanel';
 
 const LibraryBrowser: React.FC = () => {
     const {
@@ -113,47 +120,13 @@ const LibraryBrowser: React.FC = () => {
                 />
                 {/* End Libraries Column */}
                 {/* Floors Column */}
-                <div className="bg-white p-6 rounded-lg shadow">
-                    <h2 className="text-xl font-semibold mb-4 text-gray-800">
-                        {selectedLibrary
-                            ? `Floors - ${selectedLibrary.name}`
-                            : "Select a Library"}
-                    </h2>
-
-                    {!selectedLibrary && !loading.floors && (
-                        <p className="text-gray-500 text-center py-4">
-                            Please select a library first
-                        </p>
-                    )}
-
-                    {loading.floors ? (
-                        <LoadingSpinner />
-                    ) : (
-                        <ul className="space-y-2">
-                            {floors.map((floor) => (
-                                <li
-                                    key={floor.id}
-                                    className={`p-3 rounded-md h- cursor-pointer transition-colors duration-200 
-                                        ${
-                                            selectedFloor?.id === floor.id
-                                                ? "bg-blue-100 border-l-4 border-blue-500"
-                                                : "hover:bg-gray-100"
-                                        }`}
-                                    onClick={() => selectFloor(floor)}
-                                >
-                                    <h3 className="font-medium">
-                                        Floor {floor.number}
-                                    </h3>
-                                    {floor.description && (
-                                        <p className="text-xs text-gray-500">
-                                            {floor.description}
-                                        </p>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
+                <FloorSelectionPanel
+                    floors={floors}
+                    selectedLibrary={selectedLibrary}
+                    selectedFloor={selectedFloor}
+                    loading={loading.floors}
+                    onSelectFloor={selectFloor}
+                />
                 {/* End Floors Column */}
                 {/* Time Picker Column */}
                 <div className="bg-white p-6 rounded-lg shadow">
@@ -242,7 +215,7 @@ const LibraryBrowser: React.FC = () => {
                             </p>
                         )}
                 </div>
-
+                {/* End Time Picker Column */}
                 {/* Rooms Column */}
                 <div className="bg-white p-6 col-span-3 rounded-lg shadow">
                     <h2 className="text-xl font-semibold mb-4 text-gray-800">
