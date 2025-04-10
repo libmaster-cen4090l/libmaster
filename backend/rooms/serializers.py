@@ -70,6 +70,23 @@ class ReservationSerializer(serializers.ModelSerializer):
         if not is_library_open(library, end_time):
             raise serializers.ValidationError(f"{library.name} is closed at your reservation end time.")
 
+        # reservation conflict checking after basic validation but before returning data
+        conflicts = Reservation.objects.filter(
+            room=room,
+            status__in=['confirmed', 'pending'], # check both confirmed and pending
+            start_time__lt=end_time,
+            end_time__gt=start_time
+        )
+
+        # if this is an update (not a new reservation), exclude the current reservation
+        if self.instance:
+            conflicts = conflicts.exclude(pk=self.instance.pk)
+
+        if conflicts.exists():
+            raise serializers.ValidationError(
+                "This room is already reserved during the selected time period."
+            )
+
         return data
 
 

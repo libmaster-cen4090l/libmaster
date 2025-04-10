@@ -22,7 +22,7 @@
 
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import LibraryBrowser from './components/LibraryBrowser';
+import LibraryBrowser from './components/library/LibraryBrowser';
 import ReservationPage from './pages/ReservationPage';
 import MyReservations from './pages/MyReservations';
 

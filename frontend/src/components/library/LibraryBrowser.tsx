@@ -17,24 +17,22 @@
  * @component
  * @requires React
  * @requires react-router-dom
- * @requires ../contexts/LibraryContext
- * @requires ../components/AuthProvider
- * @requires ./RecentReservations
+ * @requires ../../contexts/LibraryContext
+ * @requires ../../contexts/AuthProvider
+ * @requires ../reservations/RecentReservations
  */
 
 import React, { useEffect } from "react";
-import { useLibrary } from "../contexts/LibraryContext";
-import { useAuth } from "../contexts/AuthProvider";
-import RecentReservations from "../components/reservations/RecentReservations";
+import { useLibrary } from "../../contexts/LibraryContext";
+import { useAuth } from "../../contexts/AuthProvider";
+import RecentReservations from "../reservations/RecentReservations";
 import { Link, Navigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import { addDays } from "@/api/libraryService";
-
-const LoadingSpinner = () => (
-    <div className="flex justify-center items-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-    </div>
-);
+import LoadingSpinner from '../common/LoadingSpinner';
+import StatusBadge from '../common/StatusBadge';
+import AmenityTag from '../common/AmenityTag';
+import ErrorDisplay from '../common/ErrorDisplay';
 
 const LibraryBrowser: React.FC = () => {
     const {
@@ -101,11 +99,7 @@ const LibraryBrowser: React.FC = () => {
                 </div>
             </div>
 
-            {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                    {error}
-                </div>
-            )}
+            {error && <ErrorDisplay message={error} className="mb-4" />}
 
             {/* MAIN GRID for libraries, floors, rooms, materials */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -321,46 +315,15 @@ const LibraryBrowser: React.FC = () => {
                                                 Capacity: {room.capacity}
                                             </p>
                                             <div className="flex space-x-2 text-xs mt-1">
-                                                {room.has_whiteboard && (
-                                                    <span className="bg-blue-100 shadow text-blue-800 px-2 py-1 rounded">
-                                                        Whiteboard
-                                                    </span>
-                                                )}
-                                                {room.has_monitor && (
-                                                    <span className="bg-purple-100 shadow text-purple-800 px-2 py-1 rounded">
-                                                        Monitor
-                                                    </span>
-                                                )}
-                                                {room.has_window && (
-                                                    <span className="bg-yellow-100 shadow text-yellow-800 px-2 py-1 rounded">
-                                                        Window
-                                                    </span>
-                                                )}
-                                                {room.is_graduate_only && (
-                                                    <span className="bg-indigo-100 shadow text-indigo-800 px-2 py-1 rounded">
-                                                        Grad Only
-                                                    </span>
-                                                )}
-                                                {room.requires_admin_approval && (
-                                                    <span className="bg-amber-100 shadow text-amber-800 px-2 py-1 rounded">
-                                                        Approval Req.
-                                                    </span>
-                                                )}
+                                                {room.has_whiteboard && <AmenityTag type="whiteboard" className="text-xs" />}
+                                                {room.has_monitor && <AmenityTag type="monitor" className="text-xs" />}
+                                                {room.has_window && <AmenityTag type="window" className="text-xs" />}
+                                                {room.is_graduate_only && <AmenityTag type="grad_only" className="text-xs" />}
+                                                {room.requires_admin_approval && <AmenityTag type="approval_req" className="text-xs" />}
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <span
-                                                className={`text-xs font-medium px-2 py-1 shadow rounded-full
-                                    ${
-                                        room.status === "available"
-                                            ? "bg-green-100 text-green-800"
-                                            : room.status === "maintenance"
-                                            ? "bg-yellow-100 text-yellow-800"
-                                            : "bg-red-100 text-red-800"
-                                    }`}
-                                            >
-                                                {room.status}
-                                            </span>
+                                            <StatusBadge status={room.status} />
 
                                             {room.status === "available" && (
                                                 <div className="mt-2">
