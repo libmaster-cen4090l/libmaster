@@ -392,6 +392,10 @@ class Material(models.Model):
     def __str__(self):
         return f"{self.get_name_display()} - {self.library.name}"
 
+    # added to fix the stack trace for pagination results (introduces ordering)
+    class Meta:
+        ordering = ['library', 'name']
+
 class LibrarySchedule(models.Model):
     '''A model that defines the open and close times of a library'''
     DAYS_OF_WEEK = [

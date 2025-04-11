@@ -22,7 +22,8 @@
  * @requires ./LibrarySelectionPanel
  * @requires ./FloorSelectionPanel
  * @requires ./TimeSelectionPanel
- * @requires ./RoomCard
+ * @requires ./RoomsPanel
+ * @requires ./MaterialsDisplay
  */
 
 // react dependencies
@@ -35,7 +36,7 @@ import { useLibrary } from "../../contexts/LibraryContext";
 import { useAuth } from "../../contexts/AuthProvider";
 import { addDays } from "@/api/libraryService";
 
-// user-defined component dependencies
+// modular component dependencies
 import RecentReservations from "../reservations/RecentReservations";
 import LoadingSpinner from '../common/LoadingSpinner';
 import StatusBadge from '../common/StatusBadge';
@@ -44,7 +45,8 @@ import ErrorDisplay from '../common/ErrorDisplay';
 import LibrarySelectionPanel from './LibrarySelectionPanel';
 import FloorSelectionPanel from './FloorSelectionPanel';
 import TimeSelectionPanel from './TimeSelectionPanel';
-import RoomCard from './RoomCard';
+import RoomsPanel from './RoomsPanel';
+import MaterialsDisplay from './MaterialsDisplay';
 
 const LibraryBrowser: React.FC = () => {
     const {
@@ -82,6 +84,14 @@ const LibraryBrowser: React.FC = () => {
         return `${formattedHour}:${minutes} ${period}`;
     };
 
+
+    const MY_RES_LINK_CN = `bg-emerald-400 text-center shadow hover:bg-emerald-500 
+      text-white px-4 max-h-10 min-w-40 transition-colors py-2 rounded-lg`;
+    const REFRESH_BUTTON_CN = `bg-blue-400 shadow hover:bg-blue-500 text-white px-4
+      transition-colors py-2 rounded-lg`;
+    const LOGOUT_LINK_CN = `bg-emerald-400 text-center shadow hover:bg-emerald-500
+      text-white px-4 max-h-10 min-w-40 transition-colors py-2 rounded-lg`;
+
     return (
         <div className="container mx-auto px-4 py-8">
             {/*header with navigation links */}
@@ -92,19 +102,19 @@ const LibraryBrowser: React.FC = () => {
                 <div className="flex max-h-10 gap-3">
                     <Link
                         to="/my-reservations"
-                        className="bg-emerald-400 text-center shadow hover:bg-emerald-500 text-white px-4 max-h-10 min-w-40 transition-colors py-2 rounded-lg"
+                        className={MY_RES_LINK_CN}
                     >
                         My Reservations
                     </Link>
                     <button
                         onClick={() => refreshLibraries()}
-                        className="bg-blue-400 shadow hover:bg-blue-500 text-white px-4 transition-colors py-2 rounded-lg"
+                        className={REFRESH_BUTTON_CN}
                     >
                         Refresh
                     </button>
                     <Link
                         to="/logout"
-                        className="bg-gray-400 shadow hover:bg-slate-500 text-white px-4 transition-colors py-2 rounded-lg"
+                        className={LOGOUT_LINK_CN}
                     >
                         Logout
                     </Link>
@@ -142,66 +152,22 @@ const LibraryBrowser: React.FC = () => {
                 />
                 {/* End Time Picker Column */}
                 {/* Rooms Column */}
-                <div className="bg-white p-6 col-span-3 rounded-lg shadow">
-                    <h2 className="text-xl font-semibold mb-4 text-gray-800">
-                        {selectedFloor
-                            ? `Rooms - Floor ${selectedFloor.number}`
-                            : "Select a Floor"}
-                    </h2>
-
-                    {!selectedFloor && !loading.rooms && (
-                        <p className="text-gray-500 text-center py-4">
-                            Please select a floor first
-                        </p>
-                    )}
-
-                    {loading.rooms ? (
-                        <LoadingSpinner />
-                    ) : (
-                        <ul className="space-y-2">
-                            {rooms.map((room) => (
-                                <RoomCard key={room.room_id} room={room} />
-                            ))}
-                        </ul>
-                    )}
-
-                    {rooms.length === 0 && selectedFloor && !loading.rooms && (
-                        <p className="text-gray-500 text-center py-4">
-                            No rooms available on this floor.
-                        </p>
-                    )}
-                </div>
+                <RoomsPanel
+                    rooms={rooms}
+                    selectedFloor={selectedFloor}
+                    loading={loading.rooms}
+                />
                 {/* End Rooms Column */}
                 {/* End Main Grid */}
             </div>
             {/* After main grid */}
-            {/* ADDED: Recent reservations section */}
             {/* Materials Column */}
-            {selectedLibrary && (
-                <div className="mt-6">
-                    <h2 className="text-xl font-semibold text-gray-800">
-                        Available Materials at {selectedLibrary.name}
-                    </h2>
-                    {loading.materials ? (
-                        <LoadingSpinner />
-                    ) : materials.length > 0 ? (
-                        <ul className="list-disc ml-6 mt-2">
-                            {materials.map((material) => (
-                                <li key={material.id} className="text-gray-700">
-                                    {material.name
-                                        .replace("_", " ")
-                                        .toUpperCase()}{" "}
-                                    {/* Format names */}
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p className="text-gray-600 italic">
-                            No materials available.
-                        </p>
-                    )}
-                </div>
-            )}
+            <MaterialsDisplay
+                selectedLibrary={selectedLibrary}
+                materials={materials}
+                loading={loading.materials}
+            />
+            {/* End Materials Column */}
             {isAuthenticated && (
                 <div className="mt-8">
                     <div className="bg-white p-6 rounded-lg shadow">
