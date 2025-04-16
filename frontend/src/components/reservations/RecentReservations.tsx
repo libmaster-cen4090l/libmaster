@@ -15,8 +15,8 @@
 
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import api from "../api/axiosInstance";
-import { Reservation } from "../api/libraryService";
+import api from "../../api/axiosInstance";
+import { Reservation } from "../../api/libraryService";
 
 const RecentReservations: React.FC = () => {
     // state management for reservations data, loading status, error handling

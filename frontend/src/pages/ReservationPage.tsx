@@ -27,7 +27,7 @@ import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useAuth, Role } from "../contexts/AuthProvider";
 import { useLibrary } from "../contexts/LibraryContext";
 import { Room } from "../api/libraryService";
-import ReservationForm from "../components/ReservationForm";
+import ReservationForm from "../components/reservations/ReservationForm";
 
 const ReservationPage: React.FC = () => {
     // extract room id from URL parameters

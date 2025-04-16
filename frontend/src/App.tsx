@@ -22,15 +22,17 @@
 
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import LibraryBrowser from './components/LibraryBrowser';
+import LibraryBrowser from './components/library/LibraryBrowser';
 import ReservationPage from './pages/ReservationPage';
 import MyReservations from './pages/MyReservations';
 
 const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold text-gray-900">
-        LibMaster
+      <h1 className="text-3xl font-bold">
+        {/* added garnet and gold for site header. go noles! */}
+        <span className="text-[#782F40]">Lib</span>
+        <span className="text-[#CEB888]">Master</span>
       </h1>
       <main className="pt-4">
         <Routes>
