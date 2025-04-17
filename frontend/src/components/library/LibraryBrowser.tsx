@@ -33,16 +33,16 @@ import { useAuth } from "../../contexts/AuthProvider";
 import { addDays } from "@/api/libraryService"; // not being used, will look into this after cleanup
 
 // common components
-import ErrorDisplay from '../common/ErrorDisplay';
+import ErrorDisplay from "../common/ErrorDisplay";
 
 // modular component dependencies
-import LibraryHeader from './LibraryHeader';
-import LibrarySelectionPanel from './LibrarySelectionPanel';
-import FloorSelectionPanel from './FloorSelectionPanel';
-import TimeSelectionPanel from './TimeSelectionPanel';
-import RoomsPanel from './RoomsPanel';
-import MaterialsDisplay from './MaterialsDisplay';
-import ReservationsSection from './ReservationsSection';
+import LibraryHeader from "./LibraryHeader";
+import LibrarySelectionPanel from "./LibrarySelectionPanel";
+import FloorSelectionPanel from "./FloorSelectionPanel";
+import TimeSelectionPanel from "./TimeSelectionPanel";
+import RoomsPanel from "./RoomsPanel";
+import MaterialsDisplay from "./MaterialsDisplay";
+import ReservationsSection from "./ReservationsSection";
 
 const LibraryBrowser: React.FC = () => {
     const {
@@ -84,7 +84,7 @@ const LibraryBrowser: React.FC = () => {
             {error && <ErrorDisplay message={error} className="mb-4" />}
 
             {/* MAIN GRID for Libraries, Floors, Rooms, Materials */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Libraries Column */}
                 <LibrarySelectionPanel
                     libraries={libraries}
@@ -93,23 +93,34 @@ const LibraryBrowser: React.FC = () => {
                     onSelectLibrary={selectLibrary}
                 />
 
-                {/* Floors Column */}
-                <FloorSelectionPanel
-                    floors={floors}
+                {/* Recent Reservations Section */}
+                <ReservationsSection
+                    isAuthenticated={isAuthenticated}
+                    numberOfReservations={2}
+                />
+
+                {/* Materials Display */}
+                <MaterialsDisplay
                     selectedLibrary={selectedLibrary}
-                    selectedFloor={selectedFloor}
-                    loading={loading.floors}
-                    onSelectFloor={selectFloor}
+                    materials={materials}
+                    loading={loading.materials}
                 />
 
                 {/* Time Picker Column */}
-                <TimeSelectionPanel
-                    selectedLibrary={selectedLibrary}
-                    selectedStartTime={selectedStartTime}
-                    selectedEndTime={selectedEndTime}
-                    setStartTime={setStartTime}
-                    setEndTime={setEndTime}
-                />
+                <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <TimeSelectionPanel
+                            selectedLibrary={selectedLibrary}
+                            selectedStartTime={selectedStartTime}
+                            selectedEndTime={selectedEndTime}
+                            setStartTime={setStartTime}
+                            setEndTime={setEndTime}
+                        />
+                    </div>
+                    <div className="bg-white p-3 rounded-lg w-full shadow">
+                        Floor picker
+                    </div>
+                </div>
 
                 {/* Rooms Column */}
                 <RoomsPanel
@@ -121,15 +132,14 @@ const LibraryBrowser: React.FC = () => {
                 {/* End Main Grid */}
             </div>
 
-            {/* Materials Display */}
-            <MaterialsDisplay
+            {/* Floors Column */}
+            <FloorSelectionPanel
+                floors={floors}
                 selectedLibrary={selectedLibrary}
-                materials={materials}
-                loading={loading.materials}
+                selectedFloor={selectedFloor}
+                loading={loading.floors}
+                onSelectFloor={selectFloor}
             />
-
-            { /* Recent Reservations Section */}
-            <ReservationsSection isAuthenticated={isAuthenticated} />
         </div>
     );
 };
