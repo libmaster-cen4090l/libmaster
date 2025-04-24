@@ -117,9 +117,13 @@ const LibraryBrowser: React.FC = () => {
                             setEndTime={setEndTime}
                         />
                     </div>
-                    <div className="bg-white p-3 rounded-lg w-full shadow">
-                        Floor picker
-                    </div>
+                    <FloorSelectionPanel
+                        floors={floors}
+                        selectedLibrary={selectedLibrary}
+                        selectedFloor={selectedFloor}
+                        loading={loading.floors}
+                        selectFloor={selectFloor}
+                    />
                 </div>
 
                 {/* Rooms Column */}
@@ -133,13 +137,6 @@ const LibraryBrowser: React.FC = () => {
             </div>
 
             {/* Floors Column */}
-            <FloorSelectionPanel
-                floors={floors}
-                selectedLibrary={selectedLibrary}
-                selectedFloor={selectedFloor}
-                loading={loading.floors}
-                onSelectFloor={selectFloor}
-            />
         </div>
     );
 };

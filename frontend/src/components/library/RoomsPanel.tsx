@@ -23,12 +23,6 @@ const RoomsPanel: React.FC<RoomsPanelProps> = ({
                     : "Select a Floor"}
             </h2>
 
-            {!selectedFloor && !loading && (
-                <p className="text-gray-500 text-center py-4">
-                    Please select a floor first
-                </p>
-            )}
-
             {loading ? (
                 <LoadingSpinner />
             ) : (

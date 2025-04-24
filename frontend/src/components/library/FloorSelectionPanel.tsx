@@ -1,73 +1,65 @@
 // src/components/library/FloorSelectionPanel.tsx
-import React from 'react';
-import { Floor, Library } from '@/api/libraryService';
-import LoadingSpinner from '../common/LoadingSpinner';
+import React from "react";
+import { Floor, Library } from "@/api/libraryService";
+import LoadingSpinner from "../common/LoadingSpinner";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 interface FloorSelectionPanelProps {
-  floors: Floor[];
-  selectedLibrary: Library | null;
-  selectedFloor: Floor | null;
-  loading: boolean;
-  onSelectFloor: (floor: Floor) => void;
+    floors: Floor[];
+    selectedLibrary: Library | null;
+    selectedFloor: Floor | null;
+    loading: boolean;
+    selectFloor: (floor: Floor) => void;
 }
 
 const FloorSelectionPanel: React.FC<FloorSelectionPanelProps> = ({
-  floors,
-  selectedLibrary,
-  selectedFloor,
-  loading,
-  onSelectFloor
+    floors,
+    selectedLibrary,
+    selectedFloor,
+    loading,
+    selectFloor: selectFloor,
 }) => {
-
-  return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">
-        {selectedLibrary
-          ? `Floors - ${selectedLibrary.name}`
-          : "Select a Library"}
-      </h2>
-
-      {!selectedLibrary && !loading && (
-        <p className="text-gray-500 text-center py-4">
-          Please select a library first
-        </p>
-      )}
-
-      {loading ? (
-        <LoadingSpinner />
-      ) : (
-        <ul className="space-y-2">
-          {floors.map((floor) => (
-            <li
-              key={floor.id}
-              className={`p-3 rounded-md cursor-pointer transition-colors duration-200
-                ${
-                  selectedFloor?.id === floor.id
-                    ? "bg-blue-100 border-l-4 border-blue-500"
-                    : "hover:bg-gray-100"
-                }`}
-              onClick={() => onSelectFloor(floor)}
+    return (
+        <div>
+            <Select
+                onValueChange={(value: string) => {
+                    const floor: Floor | undefined = floors.find(
+                        (floor) => floor.id.toString() === value
+                    );
+                    if (floor) selectFloor(floor);
+                }}
             >
-              <h3 className="font-medium">
-                Floor {floor.number}
-              </h3>
-              {floor.description && (
-                <p className="text-xs text-gray-500">
-                  {floor.description}
-                </p>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {floors.length === 0 && selectedLibrary && !loading && (
-        <p className="text-gray-500 text-center py-4">
-          No floors available for this library.
-        </p>
-      )}
-    </div>
-  );
+                <SelectTrigger
+                    disabled={selectedLibrary == null}
+                    className="w-full h-full bg-white p-3 rounded-lg text-base shadow"
+                >
+                    <SelectValue placeholder="Select a floor" />
+                </SelectTrigger>
+                <SelectContent>
+                    {loading ? (
+                        <LoadingSpinner />
+                    ) : (
+                        floors.map((floor) => (
+                            <SelectItem
+                                value={floor.id.toString()}
+                                className="text-base"
+                            >
+                                {`Floor ${floor.id}`}
+                            </SelectItem>
+                        ))
+                    )}
+                </SelectContent>
+            </Select>
+        </div>
+    );
 };
 
 export default FloorSelectionPanel;
