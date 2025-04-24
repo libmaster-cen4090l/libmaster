@@ -8,11 +8,11 @@ interface LibraryHeaderProps {
 }
 
 const LibraryHeader: React.FC<LibraryHeaderProps> = ({ title, onRefresh }) => {
-    const MY_RES_LINK_CN = `bg-emerald-400 text-center shadow hover:bg-emerald-500
-    text-white px-4 min-w-40 flex items-center justify-center transition-colors h-9 rounded-lg`;
-    const REFRESH_BUTTON_CN = `bg-blue-400 shadow hover:bg-blue-500 text-white px-4
+    const MY_RES_LINK_CN = `bg-emerald-500 text-center shadow hover:bg-emerald-600
+    text-white min-w-40 flex items-center justify-center transition-colors h-9 rounded-lg`;
+    const REFRESH_BUTTON_CN = `bg-blue-500 shadow hover:bg-blue-600 text-white px-4
     transition-colors flex justify-center items-center h-9 rounded-lg`;
-    const LOGOUT_LINK_CN = `bg-gray-400 shadow hover:bg-slate-500 text-white px-4
+    const LOGOUT_LINK_CN = `bg-gray-500 shadow hover:bg-slate-600 text-white px-4
     transition-colors flex justify-center items-center h-9 rounded-lg`;
 
     return (
