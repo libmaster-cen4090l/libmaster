@@ -80,18 +80,18 @@ const MyReservations: React.FC = () => {
         }
         // use libraryservice's cancellation function instead of http patch
         try {
-          const success = await cancelReservationApi(reservationId);
+            const success = await cancelReservationApi(reservationId);
 
-          if (success) {
-            // update the local state
-            setReservations((prevReservations) =>
-                prevReservations.map((res) =>
-                    res.reservation_id === reservationId
-                    ? { ...res, status: "cancelled" }
-                    : res
-                )
-            );
-          }
+            if (success) {
+                // update the local state
+                setReservations((prevReservations) =>
+                    prevReservations.map((res) =>
+                        res.reservation_id === reservationId
+                            ? { ...res, status: "cancelled" }
+                            : res
+                    )
+                );
+            }
         } catch (err) {
             alert("Failed to cancel reservation");
             console.error(err);
@@ -107,9 +107,9 @@ const MyReservations: React.FC = () => {
                     <div className="flex gap-4">
                         <Link
                             to="/"
-                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-3 flex items-center justify-center h-9 rounded-md"
                         >
-                            Back to Library Browser
+                            Back to Libraries
                         </Link>
                     </div>
                 </div>

@@ -18,7 +18,13 @@ import { Link } from "react-router-dom";
 import api from "../../api/axiosInstance";
 import { Reservation } from "../../api/libraryService";
 
-const RecentReservations: React.FC = () => {
+interface RecentReservationProps {
+    numberOfReservations: number;
+}
+
+const RecentReservations: React.FC<RecentReservationProps> = ({
+    numberOfReservations,
+}) => {
     // state management for reservations data, loading status, error handling
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [loading, setLoading] = useState(true);
@@ -34,7 +40,7 @@ const RecentReservations: React.FC = () => {
                 setLoading(true);
                 const response = await api.get("/rooms/reservations/", {
                     params: {
-                        limit: 3, // Only get the most recent 3 reservations
+                        limit: 3, // Only get the most recent 3 reservations (DOES NOT WORK)
                         status: "confirmed,pending", // Only active reservations
                     },
                 });
@@ -93,7 +99,7 @@ const RecentReservations: React.FC = () => {
     return (
         <div className="space-y-3">
             {/* map through reservations and render each one */}
-            {reservations.map((reservation) => (
+            {reservations.slice(0, numberOfReservations).map((reservation) => (
                 <div
                     key={reservation.reservation_id}
                     className="border-b pb-3 last:border-b-0 flex justify-between"
@@ -129,14 +135,14 @@ const RecentReservations: React.FC = () => {
                 </div>
             ))}
 
-            <div className="pt-2 text-center">
+            {/* <div className="pt-2 text-center">
                 <Link
                     to="/my-reservations"
                     className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
                 >
-                    Manage All Reservations
+                    Manage reservations
                 </Link>
-            </div>
+            </div> */}
         </div>
     );
 };
